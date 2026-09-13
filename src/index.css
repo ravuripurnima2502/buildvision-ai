@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Default: Midnight Luxury */
+  :root,
+  [data-theme="midnight"] {
+    color-scheme: dark;
+    --bg-base: #070A0F;
+    --bg-surface: #0F1523;
+    --bg-surface-secondary: #141C2D;
+    --bg-card: rgba(15, 21, 35, 0.85);
+    --bg-card-hover: rgba(20, 28, 45, 0.95);
+    --bg-input: #0B0F17;
+    --border-primary: rgba(212, 175, 55, 0.3);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --text-heading: #FFFFFF;
+    --text-subheading: #F1F5F9;
+    --text-primary: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --text-accent: #D4AF37;
+    --text-stat: #F8FAFC;
+    --text-btn-primary: #070A0F;
+    --text-btn-secondary: #E2E8F0;
+    --text-input: #F8FAFC;
+    --text-input-placeholder: #64748B;
+    --text-label: #CBD5E1;
+    --text-caption: #94A3B8;
+    --text-tooltip: #070A0F;
+    --accent-gold: #D4AF37;
+    --accent-gold-glow: rgba(212, 175, 55, 0.25);
+    --canvas-bg: #080C14;
+    --grid-color: rgba(212, 175, 55, 0.05);
+  }
+
+  /* Architectural White */
+  [data-theme="white"] {
+    color-scheme: light;
+    --bg-base: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-surface-secondary: #F1F5F9;
+    --bg-card: rgba(255, 255, 255, 0.95);
+    --bg-card-hover: #FFFFFF;
+    --bg-input: #FFFFFF;
+    --border-primary: rgba(184, 146, 40, 0.4);
+    --border-subtle: rgba(15, 23, 42, 0.12);
+    --text-heading: #0F172A;
+    --text-subheading: #1E293B;
+    --text-primary: #334155;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-accent: #B89228;
+    --text-stat: #0F172A;
+    --text-btn-primary: #0F172A;
+    --text-btn-secondary: #1E293B;
+    --text-input: #0F172A;
+    --text-input-placeholder: #94A3B8;
+    --text-label: #1E293B;
+    --text-caption: #475569;
+    --text-tooltip: #FFFFFF;
+    --accent-gold: #B89228;
+    --accent-gold-glow: rgba(184, 146, 40, 0.18);
+    --canvas-bg: #E2E8F0;
+    --grid-color: rgba(15, 23, 42, 0.06);
+  }
+
+  /* Sky Blueprint */
+  [data-theme="blueprint"] {
+    color-scheme: dark;
+    --bg-base: #081325;
+    --bg-surface: #0D203D;
+    --bg-surface-secondary: #122C54;
+    --bg-card: rgba(13, 32, 61, 0.88);
+    --bg-card-hover: rgba(18, 44, 84, 0.95);
+    --bg-input: #091830;
+    --border-primary: rgba(56, 189, 248, 0.35);
+    --border-subtle: rgba(56, 189, 248, 0.15);
+    --text-heading: #F0F9FF;
+    --text-subheading: #E0F2FE;
+    --text-primary: #BAE6FD;
+    --text-secondary: #7DD3FC;
+    --text-muted: #38BDF8;
+    --text-accent: #38BDF8;
+    --text-stat: #F0F9FF;
+    --text-btn-primary: #050E1F;
+    --text-btn-secondary: #F0F9FF;
+    --text-input: #F0F9FF;
+    --text-input-placeholder: #38BDF8;
+    --text-label: #E0F2FE;
+    --text-caption: #7DD3FC;
+    --text-tooltip: #050E1F;
+    --accent-gold: #38BDF8;
+    --accent-gold-glow: rgba(56, 189, 248, 0.3);
+    --canvas-bg: #06101E;
+    --grid-color: rgba(56, 189, 248, 0.1);
+  }
+
+  /* Gradient Premium */
+  [data-theme="gradient"] {
+    color-scheme: dark;
+    --bg-base: #0D081D;
+    --bg-surface: #170E30;
+    --bg-surface-secondary: #211445;
+    --bg-card: rgba(23, 14, 48, 0.88);
+    --bg-card-hover: rgba(33, 20, 69, 0.95);
+    --bg-input: #120B26;
+    --border-primary: rgba(192, 132, 252, 0.35);
+    --border-subtle: rgba(192, 132, 252, 0.15);
+    --text-heading: #FAF5FF;
+    --text-subheading: #F3E8FF;
+    --text-primary: #E9D5FF;
+    --text-secondary: #D8B4FE;
+    --text-muted: #C084FC;
+    --text-accent: #F59E0B;
+    --text-stat: #FAF5FF;
+    --text-btn-primary: #0D081D;
+    --text-btn-secondary: #FAF5FF;
+    --text-input: #FAF5FF;
+    --text-input-placeholder: #A855F7;
+    --text-label: #F3E8FF;
+    --text-caption: #D8B4FE;
+    --text-tooltip: #0D081D;
+    --accent-gold: #C084FC;
+    --accent-gold-glow: rgba(192, 132, 252, 0.3);
+    --canvas-bg: #0A0617;
+    --grid-color: rgba(192, 132, 252, 0.08);
+  }
+
+  /* Warm Sandstone */
+  [data-theme="sandstone"] {
+    color-scheme: dark;
+    --bg-base: #17130E;
+    --bg-surface: #241C15;
+    --bg-surface-secondary: #31261D;
+    --bg-card: rgba(36, 28, 21, 0.9);
+    --bg-card-hover: rgba(49, 38, 29, 0.95);
+    --bg-input: #1B150F;
+    --border-primary: rgba(217, 119, 6, 0.35);
+    --border-subtle: rgba(245, 158, 11, 0.15);
+    --text-heading: #FFFBEB;
+    --text-subheading: #FEF3C7;
+    --text-primary: #FDE68A;
+    --text-secondary: #F59E0B;
+    --text-muted: #D97706;
+    --text-accent: #F59E0B;
+    --text-stat: #FFFBEB;
+    --text-btn-primary: #17130E;
+    --text-btn-secondary: #FFFBEB;
+    --text-input: #FFFBEB;
+    --text-input-placeholder: #B45309;
+    --text-label: #FEF3C7;
+    --text-caption: #F59E0B;
+    --text-tooltip: #17130E;
+    --accent-gold: #F59E0B;
+    --accent-gold-glow: rgba(245, 158, 11, 0.3);
+    --canvas-bg: #120E0A;
+    --grid-color: rgba(245, 158, 11, 0.08);
+  }
+
+  body {
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+}
+
+/* Theme Classes */
+.bg-theme-base {
+  background-color: var(--bg-base);
+}
+
+.bg-theme-surface {
+  background-color: var(--bg-surface);
+}
+
+.bg-theme-card {
+  background-color: var(--bg-card);
+}
+
+.bg-theme-input {
+  background-color: var(--bg-input);
+}
+
+.text-theme-heading {
+  color: var(--text-heading);
+}
+
+.text-theme-subheading {
+  color: var(--text-subheading);
+}
+
+.text-theme-primary {
+  color: var(--text-primary);
+}
+
+.text-theme-secondary {
+  color: var(--text-secondary);
+}
+
+.text-theme-muted {
+  color: var(--text-muted);
+}
+
+.text-theme-accent {
+  color: var(--text-accent);
+}
+
+.text-theme-stat {
+  color: var(--text-stat);
+}
+
+.text-theme-label {
+  color: var(--text-label);
+}
+
+.text-theme-caption {
+  color: var(--text-caption);
+}
+
+.border-theme {
+  border-color: var(--border-primary);
+}
+
+.border-theme-subtle {
+  border-color: var(--border-subtle);
+}
+
+/* Architectural Blueprint Grid Pattern */
+.blueprint-grid {
+  background-size: 32px 32px;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}
+
+.blueprint-grid-dense {
+  background-size: 16px 16px;
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+}
+
+/* Metallic Gradients */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #FFF1C5 0%, var(--accent-gold) 50%, #AA820A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-silver-gradient {
+  background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-champagne-gradient {
+  background: linear-gradient(135deg, #FFFDF8 0%, #F5E8BE 60%, var(--accent-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Glassmorphism Cards with Theme Variables */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-primary);
+}
+
+.glass-panel-subtle {
+  background: var(--bg-surface);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-panel-gold {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-primary);
+  box-shadow: 0 0 30px -10px var(--accent-gold-glow);
+}
+
+.theme-card {
+  background-color: var(--bg-card);
+  border-color: var(--border-primary);
+}
+
+/* Button & Input Theme Adaptive Styling */
+.btn-gold {
+  background-color: var(--accent-gold);
+  color: var(--text-btn-primary) !important;
+  font-weight: 700;
+}
+.btn-gold:hover {
+  filter: brightness(1.1);
+}
+
+.btn-theme-surface {
+  background-color: var(--bg-card);
+  color: var(--text-theme-primary);
+  border: 1px solid var(--border-subtle);
+  transition: all 0.2s ease;
+}
+.btn-theme-surface:hover {
+  background-color: var(--bg-card-hover);
+  color: var(--text-theme-heading);
+  border-color: var(--border-primary);
+}
+
+.input-theme {
+  background-color: var(--bg-input);
+  color: var(--text-input);
+  border: 1px solid var(--border-subtle);
+}
+.input-theme::placeholder {
+  color: var(--text-input-placeholder);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-base);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-primary);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-gold);
+}
