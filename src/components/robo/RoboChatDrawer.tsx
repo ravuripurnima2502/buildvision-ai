@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { RoboContext, RoboMessage } from '../../types/robo';
+import { findCatalogItem, FURNITURE_CATALOG } from '../3d/FurnitureCatalog';
+import { buildRoomRegistry, findRoomByNameOrType } from '../3d/RoomRegistry';
 import {
   X,
   Minus,
@@ -8,6 +10,7 @@ import {
   Lightbulb,
   Sparkles,
   HelpCircle,
+  Armchair,
 } from 'lucide-react';
 
 interface RoboChatDrawerProps {
@@ -20,14 +23,15 @@ const INITIAL_MESSAGES: RoboMessage[] = [
   {
     id: 'msg_welcome',
     sender: 'robo',
-    text: "Hi! Need help with your project? I'm your AI Civil Engineer companion. I can explain civil terminology, evaluate spatial layouts, and guide your construction planning in simple language.",
+    text: "Hi! I'm your AI Civil Engineer & Architectural Copilot. You can ask me civil questions, or tell me to furnish any room (e.g. 'Add a fridge in the kitchen', 'Put a sofa in the hall', 'Kitchen lo fridge add cheyyi').",
     timestamp: 'Just now',
     suggestedQuestions: [
+      'Add a fridge in the kitchen',
+      'Put a sofa in the hall',
+      'Add a wardrobe to bedroom 1',
+      'Kitchen lo fridge add cheyyi',
       'What does RCC mean?',
       'Explain this room in simple words.',
-      'What should I consider before adding another floor?',
-      'What is a foundation?',
-      'Why is this layout useful?',
     ],
   },
 ];
@@ -67,7 +71,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
       const reply = generateRoboReply(query, context);
       setMessages((prev) => [...prev, reply]);
       setIsTyping(false);
-    }, 600);
+    }, 500);
   };
 
   return (
@@ -133,7 +137,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
                   : 'bg-white/[0.04] border border-white/[0.08] text-slate-200 rounded-bl-none shadow-sm'
               }`}
             >
-              {msg.text}
+              <div className="whitespace-pre-line">{msg.text}</div>
 
               {msg.civilTip && (
                 <div className="mt-2 pt-2 border-t border-white/[0.08] text-[11px] text-gold-400 flex items-start space-x-1.5">
@@ -183,7 +187,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask about structural reinforcement, layouts, costs…"
+            placeholder="Ask questions or say 'Add fridge in kitchen'…"
             className="flex-1 bg-[#080C14] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 font-sans"
           />
           <button
@@ -197,15 +201,122 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
 
         {/* Educational Disclaimer */}
         <p className="text-[9px] text-slate-400 mt-2 text-center leading-tight font-mono">
-          Parametric civil estimation companion • For official approval, verify with a licensed structural engineer.
+          Parametric civil estimation companion • Multilingual commands supported.
         </p>
       </div>
     </div>
   );
 };
 
+/**
+ * Natural language intent parser for Furniture & Appliance addition.
+ * Supports English, Telugu, and Hindi patterns with aliases.
+ */
+function parseFurnitureIntent(query: string): { itemQuery: string; roomQuery?: string } | null {
+  const q = query.toLowerCase().trim();
+
+  // Pattern 1: Telugu patterns
+  // "kitchen lo fridge add cheyyi", "hall lo sofa pettu", "bedroom lo wardrobe veyyi"
+  const teluguMatch = q.match(/(.+?)\s+lo\s+(.+?)(?:\s+(?:add\s+cheyyi|pettu|veyyi|pettuko))?$/i);
+  if (teluguMatch) {
+    const roomPart = teluguMatch[1].trim();
+    let itemPart = teluguMatch[2].replace(/(?:add\s+cheyyi|pettu|veyyi|pettuko)/gi, '').trim();
+    return { itemQuery: itemPart, roomQuery: roomPart };
+  }
+
+  // Pattern 2: Hindi patterns
+  // "kitchen mein fridge lagao", "hall me sofa add karo", "bedroom me bed daalo"
+  const hindiMatch = q.match(/(.+?)\s+(?:mein|me)\s+(.+?)(?:\s+(?:lagao|add\s+karo|daalo|rakho))?$/i);
+  if (hindiMatch) {
+    const roomPart = hindiMatch[1].trim();
+    let itemPart = hindiMatch[2].replace(/(?:lagao|add\s+karo|daalo|rakho)/gi, '').trim();
+    return { itemQuery: itemPart, roomQuery: roomPart };
+  }
+
+  // Pattern 3: English patterns
+  // "add a fridge in the kitchen", "put a sofa in the hall", "place wardrobe in bedroom"
+  const englishMatch = q.match(/(?:add|put|place|install)\s+(?:a|an|the)?\s*(.+?)\s+(?:in|into|to|inside|at)\s+(?:the)?\s*(.+)/i);
+  if (englishMatch) {
+    return { itemQuery: englishMatch[1].trim(), roomQuery: englishMatch[2].trim() };
+  }
+
+  // Pattern 4: "Add [item] here" / "Put [item] here"
+  const hereMatch = q.match(/(?:add|put|place|install)\s+(?:a|an|the)?\s*(.+?)\s+here/i);
+  if (hereMatch) {
+    return { itemQuery: hereMatch[1].trim(), roomQuery: 'here' };
+  }
+
+  // Pattern 5: Direct search if query contains a known furniture item
+  for (const item of FURNITURE_CATALOG) {
+    if (item.aliases.some((a) => q.includes(a)) || q.includes(item.name.toLowerCase())) {
+      // Check if room name is also mentioned
+      const words = q.split(/\s+/);
+      const roomKeywords = ['kitchen', 'hall', 'living', 'bedroom', 'bed room', 'dining', 'bathroom', 'bath', 'balcony', 'study', 'utility'];
+      const foundRoom = roomKeywords.find((rk) => q.includes(rk));
+      return { itemQuery: item.id, roomQuery: foundRoom };
+    }
+  }
+
+  return null;
+}
+
 function generateRoboReply(query: string, context: RoboContext): RoboMessage {
   const lower = query.toLowerCase();
+
+  // CHECK: Does this match a Furniture / Add Element action?
+  const furnitureIntent = parseFurnitureIntent(query);
+  if (furnitureIntent && context.onAddElement && context.currentSpec) {
+    const catalogItem = findCatalogItem(furnitureIntent.itemQuery);
+    if (!catalogItem) {
+      return {
+        id: `msg_${Date.now()}`,
+        sender: 'robo',
+        text: `I couldn't identify "${furnitureIntent.itemQuery}" in our furniture catalog. Try asking for a refrigerator, sofa, bed, wardrobe, dining table, TV, or washing machine.`,
+        timestamp: 'Just now',
+      };
+    }
+
+    const registry = buildRoomRegistry(context.currentSpec);
+
+    // Target room determination
+    let targetRoom: any;
+    if (furnitureIntent.roomQuery === 'here' || !furnitureIntent.roomQuery) {
+      if (context.selectedRoomId) {
+        targetRoom = registry.find((r) => r.id === context.selectedRoomId);
+      }
+    } else {
+      targetRoom = findRoomByNameOrType(registry, furnitureIntent.roomQuery);
+    }
+
+    if (!targetRoom && furnitureIntent.roomQuery && furnitureIntent.roomQuery !== 'here') {
+      return {
+        id: `msg_${Date.now()}`,
+        sender: 'robo',
+        text: `I couldn't find a room matching "${furnitureIntent.roomQuery}" in the current project.`,
+        timestamp: 'Just now',
+      };
+    }
+
+    // Execute central action!
+    const result = context.onAddElement(catalogItem.id, targetRoom?.id);
+
+    const roomName = targetRoom ? targetRoom.name : 'the room';
+    let replyText = `✓ Added ${catalogItem.name}\n\nRoom: ${roomName}\nPlacement: Auto-positioned inside room boundary\nEstimated Cost: ₹${catalogItem.estimatedCost.toLocaleString()}`;
+
+    let tip = `Cost updated in preliminary BOQ under Furniture & Appliances.`;
+    if (result && result.warning) {
+      tip = result.warning;
+    }
+
+    return {
+      id: `msg_${Date.now()}`,
+      sender: 'robo',
+      text: replyText,
+      civilTip: tip,
+      timestamp: 'Just now',
+    };
+  }
+
   let text = '';
   let tip = '';
 
@@ -228,11 +339,11 @@ function generateRoboReply(query: string, context: RoboContext): RoboMessage {
   } else if (lower.includes('why') && lower.includes('layout')) {
     text = "This layout uses a modular structural column grid (typically 3.5m to 4.5m spans). This avoids costly cantilever beams, maximizes usable square footage with zero dead circulation corridors, and aligns plumbing ducts vertically to simplify MEP maintenance.";
   } else if (lower.includes('cost') || lower.includes('estimate') || lower.includes('price')) {
-    text = `Your preliminary estimated turnkey cost is ₹${context.estimatedCost.toLocaleString()} (approx. ₹2,000/sq.ft for a ${context.totalAreaSqFt.toLocaleString()} sq.ft building). This covers structural earthwork, RCC superstructure, masonry, electrical/plumbing conduit networks, and premium vitrified tiling.`;
-    tip = "You can edit any material unit rate in the BOQ tab to match your local regional market rates.";
+    text = `Your preliminary estimated turnkey cost is ₹${context.estimatedCost.toLocaleString()} (approx. ₹2,000/sq.ft for a ${context.totalAreaSqFt.toLocaleString()} sq.ft building). This covers structural earthwork, RCC superstructure, masonry, electrical/plumbing conduit networks, finishes, and placed interior furniture.`;
+    tip = "You can edit any material unit rate in the BOQ tab or add appliances to see real-time cost impact.";
   } else {
-    text = `Excellent question! In ${context.projectName || 'this building'}, the structural geometry and room proportions are optimized to meet standard architectural codes. Would you like me to explain the foundation requirements, material takeoff, or spatial circulation?`;
-    tip = "You can click on any room directly in the 3D viewer to inspect its exact square footage, dimensions, and floor finishes.";
+    text = `Excellent question! In ${context.projectName || 'this building'}, you can customize surface finishes, paint colors, and add furniture directly by clicking or chatting. Would you like me to add furniture, explain structural takeoff, or inspect room circulation?`;
+    tip = "Try telling me: 'Add a fridge in the kitchen' or 'Put a sofa in the hall'!";
   }
 
   return {

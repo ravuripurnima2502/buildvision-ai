@@ -84,6 +84,46 @@ export interface Roof {
   hasWaterTank?: boolean;
 }
 
+export interface PlacedElement {
+  id: string;
+  itemType: string;
+  roomId: string;
+  position: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  rotation: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  scale: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  name?: string;
+  category?: string;
+  modelPath?: string;
+  estimatedCost?: number;
+}
+
+export interface SurfaceCustomization {
+  floor: {
+    finish: string;
+    color: string;
+  };
+  walls: {
+    finish: string;
+    color: string;
+  };
+  roof: {
+    finish: string;
+    color: string;
+  };
+}
+
 export interface BuildingSpecification {
   id: string;
   name: string;
@@ -97,6 +137,8 @@ export interface BuildingSpecification {
   floors: Floor[];
   roof: Roof;
   architecturalStyle: 'modern' | 'minimalist' | 'contemporary' | 'classic';
+  placedElements?: PlacedElement[];
+  surfaceCustomization?: SurfaceCustomization;
   createdAt: string;
   updatedAt: string;
 }

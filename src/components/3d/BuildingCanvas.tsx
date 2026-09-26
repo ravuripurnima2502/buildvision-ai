@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Grid, ContactShadows, Sky } from '@react-three/drei';
 import * as THREE from 'three';
-import { BuildingSpecification, Room } from '../../types/building';
+import { BuildingSpecification, Room, PlacedElement } from '../../types/building';
 import { BuildingModel } from './BuildingModel';
 import { WalkthroughController, WalkthroughStop, generateWalkthroughStops } from './WalkthroughController';
 import { RoomHUDLabel } from './RoomHUDLabel';
@@ -16,6 +16,9 @@ interface BuildingCanvasProps {
   showRoof?: boolean;
   selectedRoomId?: string | null;
   onSelectRoom?: (room: Room) => void;
+  // Placed Element Selection
+  selectedElementId?: string | null;
+  onSelectElement?: (element: PlacedElement) => void;
   // Walkthrough
   isWalkthroughActive?: boolean;
   walkthroughStopIndex?: number;
@@ -101,6 +104,8 @@ export const BuildingCanvas: React.FC<BuildingCanvasProps> = ({
   showRoof = true,
   selectedRoomId = null,
   onSelectRoom,
+  selectedElementId = null,
+  onSelectElement,
   isWalkthroughActive = false,
   walkthroughStopIndex = 0,
   onAdvanceWalkthrough,
@@ -320,6 +325,8 @@ export const BuildingCanvas: React.FC<BuildingCanvasProps> = ({
                 showRoof={effectiveShowRoof}
                 selectedRoomId={selectedRoomId}
                 onSelectRoom={onSelectRoom}
+                selectedElementId={selectedElementId}
+                onSelectElement={onSelectElement}
               />
             </group>
           ) : (
@@ -330,6 +337,8 @@ export const BuildingCanvas: React.FC<BuildingCanvasProps> = ({
               showRoof={effectiveShowRoof}
               selectedRoomId={selectedRoomId}
               onSelectRoom={onSelectRoom}
+              selectedElementId={selectedElementId}
+              onSelectElement={onSelectElement}
             />
           )}
 

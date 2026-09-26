@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Project, ProjectVersion } from '../../types/project';
-import { Room, BuildingSpecification } from '../../types/building';
+import { Room, BuildingSpecification, PlacedElement } from '../../types/building';
 import { EditorHeader } from './EditorHeader';
 import { BuildingCanvas } from '../3d/BuildingCanvas';
 import { ViewControls } from './ViewControls';
@@ -14,6 +14,14 @@ import { VersionHistoryModal } from '../history/VersionHistoryModal';
 import { RoboContext } from '../../types/robo';
 import { calculateEstimation } from '../../engine/estimator';
 import { generateWalkthroughStops } from '../3d/WalkthroughController';
+import { CustomizationSidebar } from '../customization/CustomizationSidebar';
+import {
+  addElementToRoom,
+  removeElementFromBuilding,
+  updateElementTransform,
+  updateSurfaceFinish,
+  updateSurfaceColor,
+} from '../customization/customizationEngine';
 
 interface WorkspaceViewProps {
   project: Project;
@@ -51,6 +59,13 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
 
   // Selected Room
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+
+  // Selected Furniture Element
+  const [selectedElementId, setSelectedElementId] = useState<string | null>(null);
+
+  // Customization Studio Sidebar Visibility
+  const [isCustomizationOpen, setIsCustomizationOpen] = useState(true);
+  const [customizationTab, setCustomizationTab] = useState<'add_element' | 'finish' | 'color'>('add_element');
 
   // Modals and Drawers
   const [isModifyModalOpen, setIsModifyModalOpen] = useState(false);
@@ -129,20 +144,36 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
     });
   };
 
-  const handleChangeMaterial = (
-    room: Room,
-    material: 'marble' | 'hardwood' | 'granite' | 'ceramic_tile' | 'polished_concrete' | 'terrace_tile'
-  ) => {
-    const updatedSpec = JSON.parse(JSON.stringify(spec));
-    for (const f of updatedSpec.floors) {
-      const r = f.rooms.find((rm: Room) => rm.id === room.id);
-      if (r) {
-        r.floorMaterial = material;
-        break;
+  // Central Single-Source-of-Truth Customization Handlers
+  const handleAddElement = (itemType: string, roomId?: string) => {
+    const res = addElementToRoom({
+      spec,
+      itemType,
+      roomId: roomId || selectedRoom?.id,
+    });
+    if (res.success) {
+      const updatedEst = calculateEstimation(res.updatedSpec);
+      const updatedVersions = project.versions.map((v) => {
+        if (v.id === project.currentVersionId) {
+          return { ...v, buildingSpec: res.updatedSpec, estimation: updatedEst };
+        }
+        return v;
+      });
+      onUpdateProject({
+        ...project,
+        versions: updatedVersions,
+      });
+      if (res.element) {
+        setSelectedElementId(res.element.id);
       }
     }
+    return res;
+  };
+
+  const handleRemoveElement = (elementId: string) => {
+    const { updatedSpec } = removeElementFromBuilding(spec, elementId);
     const updatedEst = calculateEstimation(updatedSpec);
-    const updatedVersions = project.versions.map(v => {
+    const updatedVersions = project.versions.map((v) => {
       if (v.id === project.currentVersionId) {
         return { ...v, buildingSpec: updatedSpec, estimation: updatedEst };
       }
@@ -152,7 +183,55 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
       ...project,
       versions: updatedVersions,
     });
-    setSelectedRoom(prev => prev ? { ...prev, floorMaterial: material } : null);
+    if (selectedElementId === elementId) {
+      setSelectedElementId(null);
+    }
+  };
+
+  const handleUpdateTransform = (
+    elementId: string,
+    transform: { rotation?: { x: number; y: number; z: number } }
+  ) => {
+    const updatedSpec = updateElementTransform(spec, elementId, transform);
+    const updatedVersions = project.versions.map((v) => {
+      if (v.id === project.currentVersionId) {
+        return { ...v, buildingSpec: updatedSpec };
+      }
+      return v;
+    });
+    onUpdateProject({
+      ...project,
+      versions: updatedVersions,
+    });
+  };
+
+  const handleSelectFinish = (category: 'floor' | 'walls' | 'roof', finishId: string) => {
+    const updatedSpec = updateSurfaceFinish(spec, category, finishId);
+    const updatedEst = calculateEstimation(updatedSpec);
+    const updatedVersions = project.versions.map((v) => {
+      if (v.id === project.currentVersionId) {
+        return { ...v, buildingSpec: updatedSpec, estimation: updatedEst };
+      }
+      return v;
+    });
+    onUpdateProject({
+      ...project,
+      versions: updatedVersions,
+    });
+  };
+
+  const handleSelectColor = (category: 'floor' | 'walls' | 'roof', colorHex: string) => {
+    const updatedSpec = updateSurfaceColor(spec, category, colorHex);
+    const updatedVersions = project.versions.map((v) => {
+      if (v.id === project.currentVersionId) {
+        return { ...v, buildingSpec: updatedSpec };
+      }
+      return v;
+    });
+    onUpdateProject({
+      ...project,
+      versions: updatedVersions,
+    });
   };
 
   // Context for Floating Civil Robo
@@ -161,12 +240,15 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
     totalFloors: spec.floors.length,
     totalAreaSqFt: spec.totalBuiltUpAreaSqFt,
     selectedFloor: typeof activeFloorNumber === 'number' ? activeFloorNumber : 0,
+    selectedRoomId: selectedRoom?.id,
     selectedRoomName: selectedRoom?.name,
     selectedRoomArea: selectedRoom?.areaSqFt,
     selectedRoomType: selectedRoom?.type,
     estimatedCost: estimation.totalCost,
     estimatedWeeks: estimation.totalWeeks,
     lastChangeSummary: delta?.summaryDescription,
+    currentSpec: spec,
+    onAddElement: handleAddElement,
   };
 
   useEffect(() => {
@@ -211,6 +293,8 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
               showRoof={showRoof}
               selectedRoomId={selectedRoom?.id || null}
               onSelectRoom={(room) => setSelectedRoom(room)}
+              selectedElementId={selectedElementId}
+              onSelectElement={(el) => setSelectedElementId(el ? el.id : null)}
               isWalkthroughActive={isWalkthroughActive}
               walkthroughStopIndex={walkthroughStopIndex}
               onAdvanceWalkthrough={() => {
@@ -220,6 +304,24 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
               compareMode={compareMode}
               autoRotate={autoRotate}
               lightingMode={lightingMode}
+            />
+
+            {/* Architectural Customization Studio (Add Element, Finish, Color) */}
+            <CustomizationSidebar
+              spec={spec}
+              selectedRoom={selectedRoom}
+              onSelectRoom={(r) => setSelectedRoom(r)}
+              onAddElement={handleAddElement}
+              onRemoveElement={handleRemoveElement}
+              onUpdateTransform={handleUpdateTransform}
+              onSelectFinish={handleSelectFinish}
+              onSelectColor={handleSelectColor}
+              selectedElementId={selectedElementId}
+              onSelectElement={(el) => setSelectedElementId(el ? el.id : null)}
+              isOpen={isCustomizationOpen}
+              onToggleOpen={() => setIsCustomizationOpen(!isCustomizationOpen)}
+              activeTab={customizationTab}
+              onChangeTab={setCustomizationTab}
             />
 
             {/* Room Navigator for Direct Room-by-Room Inspection */}
@@ -273,7 +375,21 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
               onQuickModify={(r) => {
                 setIsModifyModalOpen(true);
               }}
-              onChangeMaterial={handleChangeMaterial}
+              onOpenAddElement={(r) => {
+                setSelectedRoom(r);
+                setCustomizationTab('add_element');
+                setIsCustomizationOpen(true);
+              }}
+              onOpenFinishSelector={(r) => {
+                setSelectedRoom(r);
+                setCustomizationTab('finish');
+                setIsCustomizationOpen(true);
+              }}
+              onOpenColorCustomizer={(r) => {
+                setSelectedRoom(r);
+                setCustomizationTab('color');
+                setIsCustomizationOpen(true);
+              }}
             />
           </>
         )}

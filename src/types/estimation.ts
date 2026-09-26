@@ -1,7 +1,7 @@
 export interface MaterialItem {
   id: string;
   name: string;
-  category: 'structural' | 'masonry' | 'finishing' | 'openings' | 'aggregates';
+  category: 'structural' | 'masonry' | 'finishing' | 'openings' | 'aggregates' | 'furniture';
   quantity: number;
   unit: string;
   unitRate: number; // in standard currency (e.g. INR ₹)

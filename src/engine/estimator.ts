@@ -149,17 +149,54 @@ export function calculateEstimation(
     },
   ];
 
-  const directMaterialCost = materials.reduce((sum, item) => sum + item.totalCost, 0);
+  // Append placed furniture items to material takeoff
+  let furnitureTotal = 0;
+  if (spec.placedElements && spec.placedElements.length > 0) {
+    const grouped = new Map<string, { name: string; count: number; unitCost: number; category: string }>();
+    spec.placedElements.forEach((el) => {
+      const existing = grouped.get(el.itemType);
+      const cost = el.estimatedCost || 25000;
+      furnitureTotal += cost;
+      if (existing) {
+        existing.count++;
+      } else {
+        grouped.set(el.itemType, {
+          name: el.name || el.itemType,
+          count: 1,
+          unitCost: cost,
+          category: el.category || 'Furniture',
+        });
+      }
+    });
+
+    grouped.forEach((data, typeKey) => {
+      materials.push({
+        id: `mat_furn_${typeKey}`,
+        name: data.name,
+        category: 'furniture',
+        quantity: data.count,
+        unit: 'units',
+        unitRate: data.unitCost,
+        totalCost: data.count * data.unitCost,
+        description: `${data.category} element placed inside the architectural model.`,
+      });
+    });
+  }
+
+  const directMaterialCost = materials
+    .filter((m) => m.category !== 'furniture')
+    .reduce((sum, item) => sum + item.totalCost, 0);
 
   // Category splits based on comprehensive construction benchmarks
-  const totalCost = Math.round(directMaterialCost * 1.78);
+  const constructionCost = Math.round(directMaterialCost * 1.78);
+  const totalCost = constructionCost + furnitureTotal;
 
   const costBreakdown: CostCategory[] = [
     {
       id: 'cat_structure',
       name: 'Substructure & RCC Frame',
-      amount: Math.round(totalCost * 0.40),
-      percentage: 40,
+      amount: Math.round(constructionCost * 0.40),
+      percentage: Math.round((Math.round(constructionCost * 0.40) / totalCost) * 100),
       color: '#D4AF37', // Gold
       iconName: 'Building',
       description: 'Excavation, footings, plinth beam, columns, shear walls, and floor slabs.',
@@ -167,8 +204,8 @@ export function calculateEstimation(
     {
       id: 'cat_masonry',
       name: 'Masonry & Plastering',
-      amount: Math.round(totalCost * 0.16),
-      percentage: 16,
+      amount: Math.round(constructionCost * 0.16),
+      percentage: Math.round((Math.round(constructionCost * 0.16) / totalCost) * 100),
       color: '#F59E0B', // Amber
       iconName: 'Layers',
       description: 'Internal & external wall blockwork, sill slabs, and internal/external plaster.',
@@ -176,8 +213,8 @@ export function calculateEstimation(
     {
       id: 'cat_mep',
       name: 'MEP (Electrical & Plumbing)',
-      amount: Math.round(totalCost * 0.14),
-      percentage: 14,
+      amount: Math.round(constructionCost * 0.14),
+      percentage: Math.round((Math.round(constructionCost * 0.14) / totalCost) * 100),
       color: '#38BDF8', // Cyan
       iconName: 'Zap',
       description: 'Concealed copper wiring, distribution boards, CPVC water lines, and drainage.',
@@ -185,8 +222,8 @@ export function calculateEstimation(
     {
       id: 'cat_finishing',
       name: 'Finishing & Flooring',
-      amount: Math.round(totalCost * 0.18),
-      percentage: 18,
+      amount: Math.round(constructionCost * 0.18),
+      percentage: Math.round((Math.round(constructionCost * 0.18) / totalCost) * 100),
       color: '#A855F7', // Purple
       iconName: 'Paintbrush',
       description: 'Vitrified tile flooring, wall putty, acrylic emulsion paint, and false ceilings.',
@@ -194,8 +231,8 @@ export function calculateEstimation(
     {
       id: 'cat_openings',
       name: 'Doors, Windows & Railings',
-      amount: Math.round(totalCost * 0.08),
-      percentage: 8,
+      amount: Math.round(constructionCost * 0.08),
+      percentage: Math.round((Math.round(constructionCost * 0.08) / totalCost) * 100),
       color: '#10B981', // Emerald
       iconName: 'DoorOpen',
       description: 'Teakwood main door, flush internal doors, UPVC window frames, and SS balcony glass railings.',
@@ -203,13 +240,25 @@ export function calculateEstimation(
     {
       id: 'cat_misc',
       name: 'Permits, Site Prep & Quality Testing',
-      amount: Math.round(totalCost * 0.04),
-      percentage: 4,
+      amount: Math.round(constructionCost * 0.04),
+      percentage: Math.round((Math.round(constructionCost * 0.04) / totalCost) * 100),
       color: '#94A3B8', // Silver
       iconName: 'ShieldCheck',
       description: 'Soil testing, structural engineering vetting, municipal permits, and safety setup.',
     },
   ];
+
+  if (furnitureTotal > 0) {
+    costBreakdown.push({
+      id: 'cat_furniture',
+      name: 'Furniture & Appliances',
+      amount: furnitureTotal,
+      percentage: Math.round((furnitureTotal / totalCost) * 100),
+      color: '#EC4899', // Rose Pink
+      iconName: 'Armchair',
+      description: 'Interior furniture, kitchen appliances, and decorative elements.',
+    });
+  }
 
   // Timeline computation based on floor count and square footage
   const baseWeeks = 4;

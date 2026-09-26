@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import * as THREE from 'three';
-import { BuildingSpecification, Room, Floor } from '../../types/building';
+import { BuildingSpecification, Room, Floor, PlacedElement, SurfaceCustomization } from '../../types/building';
+import { FurnitureObject } from './FurnitureObject';
+import { getPBRTextureSet, getFinishDefinition } from './FinishMaterials';
 
 interface BuildingModelProps {
   spec: BuildingSpecification;
@@ -10,6 +12,8 @@ interface BuildingModelProps {
   selectedRoomId?: string | null;
   onSelectRoom?: (room: Room) => void;
   ghostMode?: boolean; // Used for before/after comparison
+  selectedElementId?: string | null;
+  onSelectElement?: (element: PlacedElement) => void;
 }
 
 export const BuildingModel: React.FC<BuildingModelProps> = ({
@@ -20,7 +24,16 @@ export const BuildingModel: React.FC<BuildingModelProps> = ({
   selectedRoomId = null,
   onSelectRoom,
   ghostMode = false,
+  selectedElementId = null,
+  onSelectElement,
 }) => {
+  // Surface customization fallback (Floor, Walls, Roof)
+  const surfaceCustomization: SurfaceCustomization = spec.surfaceCustomization || {
+    floor: { finish: 'italian_white_marble', color: '#F8FAFC' },
+    walls: { finish: 'smooth_plaster', color: '#1E293B' },
+    roof: { finish: 'clay_roof_tile', color: '#B91C1C' },
+  };
+
   // Filter floors
   const visibleFloors = useMemo(() => {
     if (activeFloorNumber === 'all') return spec.floors;
@@ -39,6 +52,7 @@ export const BuildingModel: React.FC<BuildingModelProps> = ({
           selectedRoomId={selectedRoomId}
           onSelectRoom={onSelectRoom}
           ghostMode={ghostMode}
+          surfaceCustomization={surfaceCustomization}
         />
       ))}
 
@@ -48,7 +62,28 @@ export const BuildingModel: React.FC<BuildingModelProps> = ({
           spec={spec}
           topElevation={spec.floors.length * 3.2}
           ghostMode={ghostMode}
+          surfaceCustomization={surfaceCustomization}
         />
+      )}
+
+      {/* Placed Interactive Furniture & Appliances Layer */}
+      {spec.placedElements && spec.placedElements.length > 0 && !ghostMode && (
+        <group name="placed-furniture-layer">
+          {spec.placedElements
+            .filter((item) => {
+              if (activeFloorNumber === 'all') return true;
+              const room = spec.floors.flatMap(f => f.rooms).find(r => r.id === item.roomId);
+              return room ? room.floorNumber === activeFloorNumber : true;
+            })
+            .map((item) => (
+              <FurnitureObject
+                key={item.id}
+                item={item}
+                isSelected={selectedElementId === item.id}
+                onSelect={(el) => onSelectElement && onSelectElement(el)}
+              />
+            ))}
+        </group>
       )}
     </group>
   );
@@ -62,6 +97,7 @@ interface FloorMeshProps {
   selectedRoomId: string | null;
   onSelectRoom?: (room: Room) => void;
   ghostMode?: boolean;
+  surfaceCustomization: SurfaceCustomization;
 }
 
 const FloorMesh: React.FC<FloorMeshProps> = ({
@@ -72,6 +108,7 @@ const FloorMesh: React.FC<FloorMeshProps> = ({
   selectedRoomId,
   onSelectRoom,
   ghostMode,
+  surfaceCustomization,
 }) => {
   const slabY = floor.elevation;
   const wallHeight = cutawayMode ? 1.2 : floor.height;
@@ -127,6 +164,7 @@ const FloorMesh: React.FC<FloorMeshProps> = ({
             isSelected={isSelected}
             onClick={() => onSelectRoom && onSelectRoom(room)}
             ghostMode={ghostMode}
+            surfaceCustomization={surfaceCustomization}
           />
         );
       })}
@@ -145,6 +183,7 @@ interface RoomMeshProps {
   isSelected: boolean;
   onClick: () => void;
   ghostMode?: boolean;
+  surfaceCustomization: SurfaceCustomization;
 }
 
 const RoomMesh: React.FC<RoomMeshProps> = ({
@@ -153,38 +192,38 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
   isSelected,
   onClick,
   ghostMode,
+  surfaceCustomization,
 }) => {
   const halfW = room.width / 2;
   const halfL = room.length / 2;
   const wallThick = 0.14;
 
-  // Realistic Material Color & Finish
-  const floorFinish = useMemo(() => {
-    if (ghostMode) return { color: '#475569', roughness: 0.8, metalness: 0.1 };
-    switch (room.floorMaterial || room.type) {
-      case 'marble':
-      case 'living':
-        return { color: '#F8FAFC', roughness: 0.18, metalness: 0.15 }; // Carrara marble
-      case 'hardwood':
-      case 'bedroom':
-      case 'master_bedroom':
-        return { color: '#A16207', roughness: 0.45, metalness: 0.05 }; // Warm oak
-      case 'granite':
-      case 'kitchen':
-        return { color: '#1E293B', roughness: 0.25, metalness: 0.2 }; // Polished granite
-      case 'ceramic_tile':
-      case 'bathroom':
-        return { color: '#E2E8F0', roughness: 0.35, metalness: 0.05 }; // Porcelain tile
-      case 'terrace_tile':
-      case 'balcony':
-        return { color: '#78350F', roughness: 0.65, metalness: 0.05 }; // Teak decking
-      default:
-        return { color: '#CBD5E1', roughness: 0.4, metalness: 0.1 };
-    }
-  }, [room.floorMaterial, room.type, ghostMode]);
+  // Realistic PBR Floor Finish Material & Color Tint
+  const activeFloorFinishId = room.floorMaterial
+    ? (room.floorMaterial === 'marble' ? 'italian_white_marble'
+       : room.floorMaterial === 'hardwood' ? 'oak_wood'
+       : room.floorMaterial === 'granite' ? 'granite'
+       : room.floorMaterial === 'ceramic_tile' ? 'ceramic_tile'
+       : room.floorMaterial === 'terrace_tile' ? 'teak_wood'
+       : surfaceCustomization.floor.finish)
+    : surfaceCustomization.floor.finish;
 
-  // Wall Plaster Color
-  const wallColor = ghostMode ? '#64748B' : isSelected ? '#38BDF8' : '#1E293B';
+  const floorFinishDef = useMemo(() => getFinishDefinition(activeFloorFinishId), [activeFloorFinishId]);
+  const floorPbr = useMemo(() => getPBRTextureSet(activeFloorFinishId), [activeFloorFinishId]);
+  const floorColor = ghostMode
+    ? '#475569'
+    : isSelected
+    ? '#F59E0B'
+    : surfaceCustomization.floor.color || floorFinishDef?.defaultColor || '#F8FAFC';
+
+  // Realistic PBR Wall Finish Material & Paint Color Tint
+  const wallFinishDef = useMemo(() => getFinishDefinition(surfaceCustomization.walls.finish), [surfaceCustomization.walls.finish]);
+  const wallPbr = useMemo(() => getPBRTextureSet(surfaceCustomization.walls.finish), [surfaceCustomization.walls.finish]);
+  const wallColor = ghostMode
+    ? '#64748B'
+    : isSelected
+    ? '#38BDF8'
+    : room.wallColor || surfaceCustomization.walls.color || wallFinishDef?.defaultColor || '#1E293B';
 
   // Ensure door opening exists for rooms so they are accessible and visible inside
   const effectiveOpenings = useMemo(() => {
@@ -210,13 +249,16 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
         onClick();
       }}
     >
-      {/* Realistic Finished Floor Plate */}
+      {/* Realistic PBR Finished Floor Plate with Texture & Color */}
       <mesh position={[0, 0.015, 0]} receiveShadow>
         <boxGeometry args={[room.width - 0.02, 0.03, room.length - 0.02]} />
         <meshStandardMaterial
-          color={isSelected ? '#F59E0B' : floorFinish.color}
-          roughness={floorFinish.roughness}
-          metalness={floorFinish.metalness}
+          map={floorPbr.map}
+          normalMap={floorPbr.normalMap}
+          roughnessMap={floorPbr.roughnessMap}
+          color={floorColor}
+          roughness={floorFinishDef?.roughness ?? 0.25}
+          metalness={floorFinishDef?.metalness ?? 0.1}
           transparent={ghostMode}
           opacity={ghostMode ? 0.3 : 1.0}
         />
@@ -305,6 +347,8 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
             rotation={[0, 0, 0]}
             openings={effectiveOpenings.filter(o => o.wallSide === 'north')}
             wallColor={wallColor}
+            wallPbr={wallPbr}
+            wallFinishDef={wallFinishDef}
             ghostMode={ghostMode}
           />
 
@@ -317,6 +361,8 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
             rotation={[0, 0, 0]}
             openings={effectiveOpenings.filter(o => o.wallSide === 'south')}
             wallColor={wallColor}
+            wallPbr={wallPbr}
+            wallFinishDef={wallFinishDef}
             ghostMode={ghostMode}
           />
 
@@ -329,6 +375,8 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
             rotation={[0, Math.PI / 2, 0]}
             openings={effectiveOpenings.filter(o => o.wallSide === 'west')}
             wallColor={wallColor}
+            wallPbr={wallPbr}
+            wallFinishDef={wallFinishDef}
             ghostMode={ghostMode}
           />
 
@@ -341,6 +389,8 @@ const RoomMesh: React.FC<RoomMeshProps> = ({
             rotation={[0, Math.PI / 2, 0]}
             openings={effectiveOpenings.filter(o => o.wallSide === 'east')}
             wallColor={wallColor}
+            wallPbr={wallPbr}
+            wallFinishDef={wallFinishDef}
             ghostMode={ghostMode}
           />
         </group>
@@ -365,6 +415,8 @@ interface WallWithOpeningsProps {
   rotation: [number, number, number];
   openings: any[];
   wallColor: string;
+  wallPbr?: { map: THREE.CanvasTexture; normalMap: THREE.CanvasTexture; roughnessMap: THREE.CanvasTexture };
+  wallFinishDef?: any;
   ghostMode?: boolean;
 }
 
@@ -376,6 +428,8 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
   rotation,
   openings,
   wallColor,
+  wallPbr,
+  wallFinishDef,
   ghostMode,
 }) => {
   if (!openings || openings.length === 0) {
@@ -384,9 +438,12 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
         <mesh position={[0, wallHeight / 2, 0]} castShadow receiveShadow>
           <boxGeometry args={[wallLength, wallHeight, wallThickness]} />
           <meshStandardMaterial
+            map={wallPbr?.map}
+            normalMap={wallPbr?.normalMap}
+            roughnessMap={wallPbr?.roughnessMap}
             color={wallColor}
-            roughness={0.85}
-            metalness={0.1}
+            roughness={wallFinishDef?.roughness ?? 0.85}
+            metalness={wallFinishDef?.metalness ?? 0.08}
             transparent={ghostMode}
             opacity={ghostMode ? 0.25 : 0.95}
           />
@@ -411,8 +468,12 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
       <mesh position={[-wallLength / 2 + leftSegWidth / 2, wallHeight / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[leftSegWidth, wallHeight, wallThickness]} />
         <meshStandardMaterial
+          map={wallPbr?.map}
+          normalMap={wallPbr?.normalMap}
+          roughnessMap={wallPbr?.roughnessMap}
           color={wallColor}
-          roughness={0.85}
+          roughness={wallFinishDef?.roughness ?? 0.85}
+          metalness={wallFinishDef?.metalness ?? 0.08}
           transparent={ghostMode}
           opacity={ghostMode ? 0.25 : 0.95}
         />
@@ -422,8 +483,12 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
       <mesh position={[wallLength / 2 - rightSegWidth / 2, wallHeight / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[rightSegWidth, wallHeight, wallThickness]} />
         <meshStandardMaterial
+          map={wallPbr?.map}
+          normalMap={wallPbr?.normalMap}
+          roughnessMap={wallPbr?.roughnessMap}
           color={wallColor}
-          roughness={0.85}
+          roughness={wallFinishDef?.roughness ?? 0.85}
+          metalness={wallFinishDef?.metalness ?? 0.08}
           transparent={ghostMode}
           opacity={ghostMode ? 0.25 : 0.95}
         />
@@ -433,8 +498,12 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
       <mesh position={[0, wallHeight - topHeaderHeight / 2, 0]} castShadow receiveShadow>
         <boxGeometry args={[opWidth, topHeaderHeight, wallThickness]} />
         <meshStandardMaterial
+          map={wallPbr?.map}
+          normalMap={wallPbr?.normalMap}
+          roughnessMap={wallPbr?.roughnessMap}
           color={wallColor}
-          roughness={0.85}
+          roughness={wallFinishDef?.roughness ?? 0.85}
+          metalness={wallFinishDef?.metalness ?? 0.08}
           transparent={ghostMode}
           opacity={ghostMode ? 0.25 : 0.95}
         />
@@ -445,8 +514,12 @@ const WallWithOpenings: React.FC<WallWithOpeningsProps> = ({
         <mesh position={[0, sillHeight / 2, 0]} castShadow receiveShadow>
           <boxGeometry args={[opWidth, sillHeight, wallThickness]} />
           <meshStandardMaterial
+            map={wallPbr?.map}
+            normalMap={wallPbr?.normalMap}
+            roughnessMap={wallPbr?.roughnessMap}
             color={wallColor}
-            roughness={0.85}
+            roughness={wallFinishDef?.roughness ?? 0.85}
+            metalness={wallFinishDef?.metalness ?? 0.08}
             transparent={ghostMode}
             opacity={ghostMode ? 0.25 : 0.95}
           />
@@ -1125,14 +1198,29 @@ const ArchitecturalStaircase: React.FC<{ stair: any }> = ({ stair }) => {
   );
 };
 
-const RoofMesh: React.FC<{ spec: BuildingSpecification; topElevation: number; ghostMode?: boolean }> = ({
+const RoofMesh: React.FC<{
+  spec: BuildingSpecification;
+  topElevation: number;
+  ghostMode?: boolean;
+  surfaceCustomization: SurfaceCustomization;
+}> = ({
   spec,
   topElevation,
   ghostMode,
+  surfaceCustomization,
 }) => {
   const bldgWidth = spec.plotDimensions.width - 2;
   const bldgLength = spec.plotDimensions.length - 2;
   const isGarden = spec.roof.type === 'garden';
+
+  const roofFinishId = isGarden ? 'rcc' : surfaceCustomization.roof.finish;
+  const roofFinishDef = useMemo(() => getFinishDefinition(roofFinishId), [roofFinishId]);
+  const roofPbr = useMemo(() => getPBRTextureSet(roofFinishId), [roofFinishId]);
+  const roofColor = ghostMode
+    ? '#334155'
+    : isGarden
+    ? '#065F46'
+    : surfaceCustomization.roof.color || roofFinishDef?.defaultColor || '#B91C1C';
 
   return (
     <group position={[0, topElevation, 0]}>
@@ -1140,8 +1228,12 @@ const RoofMesh: React.FC<{ spec: BuildingSpecification; topElevation: number; gh
       <mesh position={[0, 0.08, 0]} receiveShadow>
         <boxGeometry args={[bldgWidth + 0.6, 0.16, bldgLength + 0.6]} />
         <meshStandardMaterial
-          color={isGarden ? '#065F46' : '#1E293B'}
-          roughness={0.7}
+          map={roofPbr.map}
+          normalMap={roofPbr.normalMap}
+          roughnessMap={roofPbr.roughnessMap}
+          color={roofColor}
+          roughness={roofFinishDef?.roughness ?? 0.7}
+          metalness={roofFinishDef?.metalness ?? 0.1}
           transparent={ghostMode}
           opacity={ghostMode ? 0.3 : 1.0}
         />
@@ -1152,22 +1244,50 @@ const RoofMesh: React.FC<{ spec: BuildingSpecification; topElevation: number; gh
         {/* North */}
         <mesh position={[0, 0, -bldgLength / 2 - 0.2]}>
           <boxGeometry args={[bldgWidth + 0.6, 1.0, 0.15]} />
-          <meshStandardMaterial color="#334155" roughness={0.8} />
+          <meshStandardMaterial
+            map={roofPbr.map}
+            normalMap={roofPbr.normalMap}
+            roughnessMap={roofPbr.roughnessMap}
+            color={roofColor}
+            roughness={roofFinishDef?.roughness ?? 0.8}
+            metalness={roofFinishDef?.metalness ?? 0.1}
+          />
         </mesh>
         {/* South */}
         <mesh position={[0, 0, bldgLength / 2 + 0.2]}>
           <boxGeometry args={[bldgWidth + 0.6, 1.0, 0.15]} />
-          <meshStandardMaterial color="#334155" roughness={0.8} />
+          <meshStandardMaterial
+            map={roofPbr.map}
+            normalMap={roofPbr.normalMap}
+            roughnessMap={roofPbr.roughnessMap}
+            color={roofColor}
+            roughness={roofFinishDef?.roughness ?? 0.8}
+            metalness={roofFinishDef?.metalness ?? 0.1}
+          />
         </mesh>
         {/* West */}
         <mesh position={[-bldgWidth / 2 - 0.2, 0, 0]}>
           <boxGeometry args={[0.15, 1.0, bldgLength + 0.6]} />
-          <meshStandardMaterial color="#334155" roughness={0.8} />
+          <meshStandardMaterial
+            map={roofPbr.map}
+            normalMap={roofPbr.normalMap}
+            roughnessMap={roofPbr.roughnessMap}
+            color={roofColor}
+            roughness={roofFinishDef?.roughness ?? 0.8}
+            metalness={roofFinishDef?.metalness ?? 0.1}
+          />
         </mesh>
         {/* East */}
         <mesh position={[bldgWidth / 2 + 0.2, 0, 0]}>
           <boxGeometry args={[0.15, 1.0, bldgLength + 0.6]} />
-          <meshStandardMaterial color="#334155" roughness={0.8} />
+          <meshStandardMaterial
+            map={roofPbr.map}
+            normalMap={roofPbr.normalMap}
+            roughnessMap={roofPbr.roughnessMap}
+            color={roofColor}
+            roughness={roofFinishDef?.roughness ?? 0.8}
+            metalness={roofFinishDef?.metalness ?? 0.1}
+          />
         </mesh>
       </group>
 
