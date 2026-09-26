@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { AuthProvider, useAuth } from './components/auth/AuthContext';
 import { Navbar } from './components/landing/Navbar';
 import { LandingPage } from './components/landing/LandingPage';
@@ -22,11 +22,11 @@ import {
 const MainContent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
 
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'workspace'>(
-    isAuthenticated ? 'dashboard' : 'landing'
-  );
+  // Single Source of Truth for Route: Current URL Hash
+  const [currentHash, setCurrentHash] = useState<string>(() => window.location.hash || '#/');
 
-  const [projects, setProjects] = useState<Project[]>([]);
+  // Projects State from localStorage (key: buildvision_projects)
+  const [projects, setProjects] = useState<Project[]>(() => loadProjects());
   const [activeProjectId, setActiveProjectId] = useState<string | null>(null);
 
   // Theme Selector Modal
@@ -35,48 +35,90 @@ const MainContent: React.FC = () => {
   // Workspace Robo Context sync
   const [workspaceRoboContext, setWorkspaceRoboContext] = useState<RoboContext | null>(null);
 
-  // Auth Modal
+  // Auth Modal (Simple local profile dialog)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authMode, setAuthMode] = useState<'login' | 'register' | 'forgot_password'>('login');
 
-  // Direct Wizard from Landing Page
+  // Direct Wizard Journey from Landing Page
   const [activeJourney, setActiveJourney] = useState<JourneyType | null>(null);
 
+  // Listen to hash changes cleanly
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash || '#/');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Parse current route
+  const { routePath, projectQueryId } = useMemo(() => {
+    const raw = currentHash.replace(/^#\/?/, '');
+    const [pathPart, queryPart] = raw.split('?');
+    const params = new URLSearchParams(queryPart || '');
+    return {
+      routePath: (pathPart || '').toLowerCase(),
+      projectQueryId: params.get('project'),
+    };
+  }, [currentHash]);
+
+  // Refresh projects on mount or project list change
   useEffect(() => {
     setProjects(loadProjects());
   }, []);
 
-  // Update view when auth state changes
-  useEffect(() => {
-    if (isAuthenticated && currentView === 'landing') {
-      setCurrentView('dashboard');
+  // Determine current active view: 'landing' | 'dashboard' | 'workspace'
+  const currentView = useMemo<'landing' | 'dashboard' | 'workspace'>(() => {
+    if (routePath.startsWith('workspace')) {
+      return 'workspace';
     }
-  }, [isAuthenticated]);
+    if (
+      routePath.startsWith('dashboard') ||
+      routePath.startsWith('projects') ||
+      routePath.startsWith('create') ||
+      routePath.startsWith('estimation') ||
+      routePath.startsWith('history')
+    ) {
+      return 'dashboard';
+    }
+    return 'landing';
+  }, [routePath]);
 
-  const handleOpenAuth = (mode: 'login' | 'register' = 'login') => {
+  // Sync activeProjectId from URL if in workspace
+  useEffect(() => {
+    if (currentView === 'workspace') {
+      if (projectQueryId) {
+        const proj = getProjectById(projectQueryId);
+        if (proj) {
+          setActiveProjectId(proj.id);
+        } else if (projects.length > 0) {
+          setActiveProjectId(projects[0].id);
+        }
+      } else if (!activeProjectId && projects.length > 0) {
+        setActiveProjectId(projects[0].id);
+      }
+    }
+  }, [currentView, projectQueryId, projects, activeProjectId]);
+
+  const handleOpenAuth = (mode: 'login' | 'register' | 'forgot_password' = 'login') => {
     setAuthMode(mode);
     setIsAuthModalOpen(true);
   };
 
   const handleStartBuilding = () => {
-    if (!isAuthenticated) {
-      handleOpenAuth('register');
-    } else {
-      setCurrentView('dashboard');
-    }
+    window.location.hash = '#/dashboard';
   };
 
   const handleSelectJourneyFromLanding = (journey: JourneyType) => {
-    if (!isAuthenticated) {
-      handleOpenAuth('register');
-    } else {
-      setActiveJourney(journey);
-    }
+    setActiveJourney(journey);
   };
 
   const handleOpenProject = (id: string) => {
-    setActiveProjectId(id);
-    setCurrentView('workspace');
+    const proj = getProjectById(id);
+    if (proj) {
+      setActiveProjectId(proj.id);
+      window.location.hash = `#/workspace?project=${proj.id}`;
+    }
   };
 
   const handleDuplicateProject = (id: string) => {
@@ -88,10 +130,13 @@ const MainContent: React.FC = () => {
 
   const handleDeleteProject = (id: string) => {
     deleteProject(id);
-    setProjects(loadProjects());
+    const updated = loadProjects();
+    setProjects(updated);
     if (activeProjectId === id) {
-      setActiveProjectId(null);
-      setCurrentView('dashboard');
+      setActiveProjectId(updated.length > 0 ? updated[0].id : null);
+      if (updated.length === 0) {
+        window.location.hash = '#/dashboard';
+      }
     }
   };
 
@@ -106,10 +151,11 @@ const MainContent: React.FC = () => {
   };
 
   const handleProjectCreated = (newProject: Project) => {
-    saveProject(newProject);
+    const taggedProject: Project = { ...newProject, userId: user?.id || 'usr_local' };
+    saveProject(taggedProject);
     setProjects(loadProjects());
-    setActiveProjectId(newProject.id);
-    setCurrentView('workspace');
+    setActiveProjectId(taggedProject.id);
+    window.location.hash = `#/workspace?project=${taggedProject.id}`;
   };
 
   const handleUpdateActiveProject = (updated: Project) => {
@@ -117,41 +163,46 @@ const MainContent: React.FC = () => {
     setProjects(loadProjects());
   };
 
-  const activeProject = activeProjectId ? projects.find(p => p.id === activeProjectId) : null;
+  const activeProject = activeProjectId
+    ? projects.find(p => p.id === activeProjectId) || projects[0] || null
+    : projects[0] || null;
 
   const currentVersion = activeProject
     ? activeProject.versions.find(v => v.id === activeProject.currentVersionId) || activeProject.versions[0]
     : null;
 
-  // Active Robo Context computation
-  const activeRoboContext: RoboContext = (currentView === 'workspace' && workspaceRoboContext)
-    ? workspaceRoboContext
-    : activeProject && currentVersion
-    ? {
-        projectName: activeProject.title,
-        totalFloors: currentVersion.buildingSpec.floors.length,
-        totalAreaSqFt: currentVersion.buildingSpec.totalBuiltUpAreaSqFt,
-        selectedFloor: 0,
-        estimatedCost: currentVersion.estimation.totalCost,
-        estimatedWeeks: currentVersion.estimation.totalWeeks,
-      }
-    : {
-        projectName: currentView === 'dashboard' ? 'BuildVision AI Dashboard' : 'BuildVision AI Platform',
-        totalFloors: 2,
-        totalAreaSqFt: 2400,
-        selectedFloor: 0,
-        estimatedCost: 5500000,
-        estimatedWeeks: 24,
-      };
+  // Active Robo Context
+  const activeRoboContext: RoboContext =
+    currentView === 'workspace' && workspaceRoboContext
+      ? workspaceRoboContext
+      : activeProject && currentVersion
+      ? {
+          projectName: activeProject.title,
+          totalFloors: currentVersion.buildingSpec.floors.length,
+          totalAreaSqFt: currentVersion.buildingSpec.totalBuiltUpAreaSqFt,
+          selectedFloor: 0,
+          estimatedCost: currentVersion.estimation.totalCost,
+          estimatedWeeks: currentVersion.estimation.totalWeeks,
+        }
+      : {
+          projectName: currentView === 'dashboard' ? 'BuildVision AI Dashboard' : 'BuildVision AI Platform',
+          totalFloors: 2,
+          totalAreaSqFt: 3200,
+          selectedFloor: 0,
+          estimatedCost: 6800000,
+          estimatedWeeks: 28,
+        };
 
   return (
     <div className="min-h-screen bg-theme-base text-theme-primary flex flex-col selection:bg-gold-500/30 selection:text-gold-200 transition-colors duration-300">
-      {/* Navigation Header (Hidden in Workspace for full immersion) */}
+      {/* Navigation Header (Hidden in Workspace for full BIM immersion) */}
       {currentView !== 'workspace' && (
         <Navbar
           onOpenAuth={handleOpenAuth}
           currentView={currentView}
-          onNavigate={(view) => setCurrentView(view)}
+          onNavigate={(view) => {
+            window.location.hash = view === 'dashboard' ? '#/dashboard' : '#/';
+          }}
           onOpenThemeSelector={() => setIsThemeModalOpen(true)}
         />
       )}
@@ -180,14 +231,16 @@ const MainContent: React.FC = () => {
           <WorkspaceView
             project={activeProject}
             onUpdateProject={handleUpdateActiveProject}
-            onBackToDashboard={() => setCurrentView('dashboard')}
+            onBackToDashboard={() => {
+              window.location.hash = '#/dashboard';
+            }}
             onOpenThemeSelector={() => setIsThemeModalOpen(true)}
             onUpdateRoboContext={setWorkspaceRoboContext}
           />
         )}
       </main>
 
-      {/* Permanently Mounted Floating AI Civil Engineer Robo */}
+      {/* Floating AI Civil Engineer Robo */}
       <FloatingRobo context={activeRoboContext} />
 
       {/* Architectural Theme Selector Modal */}
@@ -196,14 +249,14 @@ const MainContent: React.FC = () => {
         onClose={() => setIsThemeModalOpen(false)}
       />
 
-      {/* Auth Modal */}
+      {/* Profile / Account Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
         initialMode={authMode}
       />
 
-      {/* Direct Journey Wizard from Landing */}
+      {/* Direct Journey Wizard from Landing / Dashboard */}
       {activeJourney && (
         <JourneyWizard
           journeyType={activeJourney}

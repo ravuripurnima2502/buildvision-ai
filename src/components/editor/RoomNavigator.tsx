@@ -4,11 +4,9 @@ import {
   Compass,
   ChevronDown,
   ChevronUp,
-  Maximize2,
   Home,
-  Layers,
-  Sparkles,
   Eye,
+  Layers,
 } from 'lucide-react';
 
 interface RoomNavigatorProps {
@@ -37,48 +35,48 @@ export const RoomNavigator: React.FC<RoomNavigatorProps> = ({
   const selectedRoom = allRooms.find(r => r.id === selectedRoomId);
 
   return (
-    <div className="absolute top-20 left-4 z-20 pointer-events-auto select-none max-w-xs transition-all">
-      <div className="bg-charcoal-900/90 backdrop-blur-xl border border-theme-subtle rounded-2xl shadow-xl overflow-hidden">
+    <div className="absolute top-24 left-4 z-20 pointer-events-auto select-none w-64 sm:w-72 transition-all">
+      <div className="bg-[#0B1017]/90 backdrop-blur-xl border border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden">
         {/* Navigation Header */}
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className="px-3.5 py-2.5 flex items-center justify-between cursor-pointer hover:bg-theme-card/50 transition-colors border-b border-theme-subtle"
+          className="px-3.5 py-2.5 flex items-center justify-between cursor-pointer hover:bg-white/[0.04] transition-colors border-b border-white/[0.06]"
         >
           <div className="flex items-center space-x-2">
-            <Compass className="w-4 h-4 text-gold-400" />
-            <span className="text-xs font-display font-bold text-theme-heading tracking-wide">
-              Room Explorer
+            <Compass className="w-4 h-4 text-gold-400 stroke-[2.2]" />
+            <span className="text-xs font-display font-bold text-white tracking-wide">
+              Spatial Directory
             </span>
-            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-full bg-gold-500/10 text-gold-400 border border-gold-500/20 font-semibold">
               {visibleRooms.length}
             </span>
           </div>
 
-          <button className="text-theme-secondary hover:text-gold-400 p-0.5">
+          <button className="text-slate-400 hover:text-white p-0.5 cursor-pointer">
             {isOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
           </button>
         </div>
 
         {/* Collapsible Room Chips & Selector */}
         {isOpen && (
-          <div className="p-2 space-y-1 max-h-60 overflow-y-auto">
+          <div className="p-2 space-y-1 max-h-64 overflow-y-auto">
             {/* Quick Exit to Exterior View */}
             <button
               onClick={() => {
                 onSelectRoom(null);
                 onResetExterior();
               }}
-              className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-mono flex items-center justify-between transition-all ${
+              className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs font-mono flex items-center justify-between transition-all cursor-pointer ${
                 !selectedRoomId
                   ? 'bg-gold-500 text-charcoal-950 font-bold shadow-gold-glow'
-                  : 'text-theme-secondary hover:bg-theme-card hover:text-theme-heading'
+                  : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
               }`}
             >
               <span className="flex items-center space-x-1.5">
                 <Home className="w-3.5 h-3.5" />
-                <span>Exterior Overview</span>
+                <span>Building Isometric</span>
               </span>
-              <span className="text-[10px] opacity-75">Full View</span>
+              <span className="text-[10px] opacity-75 font-mono">Exterior</span>
             </button>
 
             {/* Room List */}
@@ -91,21 +89,21 @@ export const RoomNavigator: React.FC<RoomNavigatorProps> = ({
                   <button
                     key={room.id}
                     onClick={() => onSelectRoom(room)}
-                    className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition-all flex items-center justify-between group ${
+                    className={`w-full px-2.5 py-1.5 rounded-xl text-left text-xs transition-all flex items-center justify-between group cursor-pointer ${
                       isSelected
-                        ? 'bg-cyan-500 text-charcoal-950 font-bold shadow-blueprint-glow'
-                        : 'text-theme-primary hover:bg-theme-card hover:text-gold-400'
+                        ? 'bg-sky-500 text-charcoal-950 font-bold shadow-blueprint-glow'
+                        : 'text-slate-300 hover:bg-white/[0.04] hover:text-gold-300'
                     }`}
                   >
                     <span className="truncate pr-2">{room.name}</span>
-                    <div className="flex items-center space-x-1 flex-shrink-0">
-                      <span className={`text-[10px] font-mono px-1 rounded ${
-                        isSelected ? 'bg-charcoal-950/20 text-charcoal-950' : 'text-theme-muted bg-theme-base'
+                    <div className="flex items-center space-x-1.5 flex-shrink-0">
+                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded ${
+                        isSelected ? 'bg-charcoal-950/25 text-charcoal-950 font-bold' : 'text-slate-400 bg-white/[0.04]'
                       }`}>
                         {floorLabel}
                       </span>
                       <span className={`text-[10px] font-mono ${
-                        isSelected ? 'text-charcoal-950/80 font-bold' : 'text-theme-secondary'
+                        isSelected ? 'text-charcoal-950 font-bold' : 'text-slate-400'
                       }`}>
                         {Math.round(room.areaSqFt)}sf
                       </span>
@@ -117,21 +115,21 @@ export const RoomNavigator: React.FC<RoomNavigatorProps> = ({
           </div>
         )}
 
-        {/* Currently Inspected Room Quick Tip */}
+        {/* Currently Inspected Room Quick Telemetry */}
         {selectedRoom && (
-          <div className="px-3 py-1.5 bg-theme-base/60 border-t border-theme-subtle flex items-center justify-between text-[10px] font-mono text-gold-400">
-            <span className="flex items-center space-x-1 truncate">
+          <div className="px-3 py-1.5 bg-[#080C14] border-t border-white/[0.06] flex items-center justify-between text-[10px] font-mono text-gold-400">
+            <span className="flex items-center space-x-1.5 truncate">
               <Eye className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">Viewing: {selectedRoom.name}</span>
+              <span className="truncate">Active: {selectedRoom.name}</span>
             </span>
             <button
               onClick={() => {
                 onSelectRoom(null);
                 onResetExterior();
               }}
-              className="text-theme-muted hover:text-red-400 underline ml-2 flex-shrink-0"
+              className="text-slate-400 hover:text-white underline cursor-pointer"
             >
-              Exit
+              Reset
             </button>
           </div>
         )}

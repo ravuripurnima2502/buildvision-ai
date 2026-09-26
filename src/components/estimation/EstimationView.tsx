@@ -12,6 +12,7 @@ import {
   FileSpreadsheet,
   Download,
   Building,
+  Sparkles,
 } from 'lucide-react';
 
 interface EstimationViewProps {
@@ -34,59 +35,60 @@ export const EstimationView: React.FC<EstimationViewProps> = ({
   };
 
   return (
-    <div className="min-h-full bg-charcoal-950 text-slate-100 blueprint-grid p-4 sm:p-8 max-w-7xl mx-auto space-y-8">
+    <div className="min-h-full bg-[#080C14] text-slate-100 p-4 sm:p-8 max-w-7xl mx-auto space-y-8 select-none">
       {/* Estimation Header & Subtabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-6">
         <div>
-          <span className="text-[10px] font-mono uppercase tracking-widest text-gold-400 bg-gold-500/10 px-2.5 py-1 rounded border border-gold-500/20">
-            ENGINEERING BILL OF QUANTITIES
+          <span className="text-[10px] font-mono uppercase tracking-widest text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20 font-semibold inline-flex items-center space-x-1.5">
+            <Sparkles className="w-3 h-3" />
+            <span>CIVIL ESTIMATION & BILL OF QUANTITIES</span>
           </span>
-          <h2 className="text-2xl sm:text-3xl font-display font-bold text-white mt-1.5">
-            Estimation & Construction Planning
+          <h2 className="text-2xl sm:text-3xl font-display font-bold text-white mt-2 tracking-tight">
+            Estimation & Material Takeoff Studio
           </h2>
-          <p className="text-xs text-slate-400 font-mono mt-0.5">
-            Project: {spec.name} • Built-Up Area: {spec.totalBuiltUpAreaSqFt.toLocaleString()} sq.ft • {spec.floors.length} Floors
+          <p className="text-xs text-slate-400 font-mono mt-1">
+            Project: <span className="text-slate-200">{spec.name}</span> • Built-Up Area: <span className="text-gold-300 font-bold">{spec.totalBuiltUpAreaSqFt.toLocaleString()} sq.ft</span> • {spec.floors.length} Levels
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           {/* Sub-navigation tabs */}
-          <div className="bg-charcoal-900 p-1 rounded-xl border border-slate-800 flex items-center space-x-1">
+          <div className="bg-[#0B1017] p-1 rounded-2xl border border-white/[0.08] flex items-center space-x-1 shadow-inner">
             <button
               onClick={() => setSubTab('cost')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                subTab === 'cost' ? 'bg-gold-500 text-charcoal-950 shadow-gold-glow' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                subTab === 'cost' ? 'bg-gold-500 text-charcoal-950 font-bold shadow-gold-glow' : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <PieChart className="w-3.5 h-3.5" />
-              <span>Cost Estimate</span>
+              <PieChart className="w-3.5 h-3.5 stroke-[2.2]" />
+              <span>Cost Forecast</span>
             </button>
 
             <button
               onClick={() => setSubTab('materials')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                subTab === 'materials' ? 'bg-gold-500 text-charcoal-950 shadow-gold-glow' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                subTab === 'materials' ? 'bg-gold-500 text-charcoal-950 font-bold shadow-gold-glow' : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <Package className="w-3.5 h-3.5" />
+              <Package className="w-3.5 h-3.5 stroke-[2.2]" />
               <span>Materials (BOQ)</span>
             </button>
 
             <button
               onClick={() => setSubTab('timeline')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition-all ${
-                subTab === 'timeline' ? 'bg-gold-500 text-charcoal-950 shadow-gold-glow' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 transition-all cursor-pointer ${
+                subTab === 'timeline' ? 'bg-gold-500 text-charcoal-950 font-bold shadow-gold-glow' : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <Clock className="w-3.5 h-3.5" />
-              <span>Timeline</span>
+              <Clock className="w-3.5 h-3.5 stroke-[2.2]" />
+              <span>Gantt Timeline</span>
             </button>
           </div>
 
           <button
             onClick={handlePrint}
-            title="Export / Print BOQ Report"
-            className="p-2 rounded-xl bg-charcoal-900 hover:bg-charcoal-800 text-slate-400 hover:text-gold-300 border border-slate-800 transition-colors"
+            title="Print BOQ Specification"
+            className="p-2.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-400 hover:text-gold-300 border border-white/[0.08] hover:border-gold-500/40 transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" />
           </button>

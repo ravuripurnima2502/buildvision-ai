@@ -3,24 +3,24 @@
 @tailwind utilities;
 
 @layer base {
-  /* Default: Midnight Luxury */
+  /* Default: Midnight Luxury Architectural */
   :root,
   [data-theme="midnight"] {
     color-scheme: dark;
-    --bg-base: #070A0F;
-    --bg-surface: #0F1523;
-    --bg-surface-secondary: #141C2D;
-    --bg-card: rgba(15, 21, 35, 0.85);
-    --bg-card-hover: rgba(20, 28, 45, 0.95);
-    --bg-input: #0B0F17;
-    --border-primary: rgba(212, 175, 55, 0.3);
+    --bg-base: #080C14;
+    --bg-surface: #0E1522;
+    --bg-surface-secondary: #141E2F;
+    --bg-card: rgba(14, 21, 34, 0.88);
+    --bg-card-hover: rgba(20, 30, 47, 0.95);
+    --bg-input: #0A0F1A;
+    --border-primary: rgba(212, 168, 67, 0.28);
     --border-subtle: rgba(255, 255, 255, 0.08);
     --text-heading: #FFFFFF;
     --text-subheading: #F1F5F9;
     --text-primary: #E2E8F0;
     --text-secondary: #94A3B8;
     --text-muted: #64748B;
-    --text-accent: #D4AF37;
+    --text-accent: #D4A843;
     --text-stat: #F8FAFC;
     --text-btn-primary: #070A0F;
     --text-btn-secondary: #E2E8F0;
@@ -29,10 +29,10 @@
     --text-label: #CBD5E1;
     --text-caption: #94A3B8;
     --text-tooltip: #070A0F;
-    --accent-gold: #D4AF37;
-    --accent-gold-glow: rgba(212, 175, 55, 0.25);
-    --canvas-bg: #080C14;
-    --grid-color: rgba(212, 175, 55, 0.05);
+    --accent-gold: #D4A843;
+    --accent-gold-glow: rgba(212, 168, 67, 0.22);
+    --canvas-bg: #070B12;
+    --grid-color: rgba(212, 168, 67, 0.04);
   }
 
   /* Architectural White */
@@ -41,11 +41,11 @@
     --bg-base: #F8FAFC;
     --bg-surface: #FFFFFF;
     --bg-surface-secondary: #F1F5F9;
-    --bg-card: rgba(255, 255, 255, 0.95);
+    --bg-card: rgba(255, 255, 255, 0.96);
     --bg-card-hover: #FFFFFF;
-    --bg-input: #FFFFFF;
-    --border-primary: rgba(184, 146, 40, 0.4);
-    --border-subtle: rgba(15, 23, 42, 0.12);
+    --bg-input: #F8FAFC;
+    --border-primary: rgba(184, 146, 40, 0.35);
+    --border-subtle: rgba(15, 23, 42, 0.08);
     --text-heading: #0F172A;
     --text-subheading: #1E293B;
     --text-primary: #334155;
@@ -61,9 +61,9 @@
     --text-caption: #475569;
     --text-tooltip: #FFFFFF;
     --accent-gold: #B89228;
-    --accent-gold-glow: rgba(184, 146, 40, 0.18);
+    --accent-gold-glow: rgba(184, 146, 40, 0.16);
     --canvas-bg: #E2E8F0;
-    --grid-color: rgba(15, 23, 42, 0.06);
+    --grid-color: rgba(15, 23, 42, 0.05);
   }
 
   /* Sky Blueprint */
@@ -243,15 +243,15 @@
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
 }
 
-/* Metallic Gradients */
+/* Metallic & Architectural Gradients */
 .text-gold-gradient {
-  background: linear-gradient(135deg, #FFF1C5 0%, var(--accent-gold) 50%, #AA820A 100%);
+  background: linear-gradient(135deg, #FFF6DA 0%, var(--accent-gold) 45%, #C29835 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-silver-gradient {
-  background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
+  background: linear-gradient(135deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -262,18 +262,19 @@
   -webkit-text-fill-color: transparent;
 }
 
-/* Glassmorphism Cards with Theme Variables */
+/* Precision CAD Glass Panels */
 .glass-panel {
   background: var(--bg-card);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border-primary);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.45);
 }
 
 .glass-panel-subtle {
   background: var(--bg-surface);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--border-subtle);
 }
 
@@ -282,7 +283,29 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-primary);
-  box-shadow: 0 0 30px -10px var(--accent-gold-glow);
+  box-shadow: 0 0 35px -8px var(--accent-gold-glow);
+}
+
+.cad-panel {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+}
+
+.cad-panel-interactive {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  border-radius: 1rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cad-panel-interactive:hover {
+  background-color: var(--bg-card-hover);
+  border-color: var(--border-primary);
+  box-shadow: 0 12px 36px -4px rgba(0, 0, 0, 0.55), 0 0 25px -4px var(--accent-gold-glow);
+  transform: translateY(-2px);
 }
 
 .theme-card {
@@ -290,14 +313,24 @@
   border-color: var(--border-primary);
 }
 
-/* Button & Input Theme Adaptive Styling */
+/* Button & Input Architectural Styling */
 .btn-gold {
-  background-color: var(--accent-gold);
+  background: linear-gradient(135deg, #E5C466 0%, var(--accent-gold) 50%, #C29835 100%);
   color: var(--text-btn-primary) !important;
   font-weight: 700;
+  box-shadow: 0 2px 10px -2px rgba(212, 168, 67, 0.4);
+  transition: all 0.2s ease;
 }
+
 .btn-gold:hover {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
+  box-shadow: 0 4px 18px -2px rgba(212, 168, 67, 0.6);
+  transform: translateY(-1px);
+}
+
+.btn-gold:active {
+  transform: translateY(0px);
+  filter: brightness(0.96);
 }
 
 .btn-theme-surface {
@@ -306,6 +339,7 @@
   border: 1px solid var(--border-subtle);
   transition: all 0.2s ease;
 }
+
 .btn-theme-surface:hover {
   background-color: var(--bg-card-hover);
   color: var(--text-theme-heading);
@@ -316,7 +350,15 @@
   background-color: var(--bg-input);
   color: var(--text-input);
   border: 1px solid var(--border-subtle);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
+
+.input-theme:focus {
+  outline: none;
+  border-color: var(--border-primary);
+  box-shadow: 0 0 0 2px var(--accent-gold-glow);
+}
+
 .input-theme::placeholder {
   color: var(--text-input-placeholder);
 }
@@ -326,13 +368,16 @@
   width: 6px;
   height: 6px;
 }
+
 ::-webkit-scrollbar-track {
   background: var(--bg-base);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: var(--border-primary);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-gold);
 }

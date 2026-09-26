@@ -1,7 +1,6 @@
 import React from 'react';
 import { Hero3DPreview } from '../3d/Hero3DPreview';
 import {
-  Sparkles,
   ArrowRight,
   Layers,
   Compass,
@@ -11,10 +10,15 @@ import {
   Bot,
   Presentation,
   CheckCircle2,
-  Building,
+  Building2,
   Ruler,
   Eye,
   ShieldCheck,
+  ChevronRight,
+  Cpu,
+  FileSpreadsheet,
+  Boxes,
+  Sparkles,
 } from 'lucide-react';
 
 interface LandingPageProps {
@@ -27,169 +31,207 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onSelectJourney,
 }) => {
   const steps = [
-    { num: '01', title: 'Start with an Idea', desc: 'Choose from requirements, conceptual brief, or your existing built structure.', icon: Compass },
-    { num: '02', title: 'Build the Structure', desc: 'AI converts spatial parameters into a watertight 3D architectural specification.', icon: Layers },
-    { num: '03', title: 'Explore it in 3D', desc: 'Inspect floor-by-floor, rotate, zoom, cutaway, and take cinematic interior walkthroughs.', icon: Eye },
-    { num: '04', title: 'Modify the Design', desc: 'Request natural language revisions: add balconies, enlarge rooms, or add floors.', icon: Repeat },
-    { num: '05', title: 'Understand the Impact', desc: 'Instantly view Change Impact: exact area delta, materials shift, cost, and time.', icon: Ruler },
-    { num: '06', title: 'Estimate Cost & Time', desc: 'Full Bill of Quantities (BOQ), editable unit rates, and phased Gantt timeline.', icon: DollarSign },
-    { num: '07', title: 'Present to Your Client', desc: 'Switch to distraction-free client presentation mode with one click for pitch meetings.', icon: Presentation },
+    { num: '01', title: 'Define Spatial Brief', desc: 'Input plot dimensions, family requirements, or describe your vision in natural language.', icon: Compass },
+    { num: '02', title: 'Generate 3D BIM Model', desc: 'AI translates parameters into a coordinate-accurate, multi-level architectural structure.', icon: Layers },
+    { num: '03', title: 'Cutaway & Walkthrough', desc: 'Inspect floor-by-floor with plan cutaways, daylight simulation, and cinematic interior tours.', icon: Eye },
+    { num: '04', title: 'Modify in Natural Language', desc: 'Request architectural revisions: add balconies, cantilever rooms, or stack additional floors.', icon: Repeat },
+    { num: '05', title: 'Live Change Impact Delta', desc: 'Instantly view exact square footage delta, material quantity shifts, and cost impact.', icon: Ruler },
+    { num: '06', title: 'Itemized BOQ & Timeline', desc: 'Turnkey Bill of Quantities with editable unit rates and phased construction Gantt schedule.', icon: DollarSign },
+    { num: '07', title: 'Client Presentation Mode', desc: 'Switch to a distraction-free executive pitch viewport with live Before/After comparison.', icon: Presentation },
+    { num: '08', title: 'BIM Specification Export', desc: 'Export full coordinate specifications and project metadata ready for construction teams.', icon: Boxes },
   ];
 
   return (
-    <div className="min-h-screen bg-charcoal-950 text-slate-100 blueprint-grid pb-24">
-      {/* Hero Section */}
-      <section className="relative pt-12 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        {/* Glow ambient background orbs */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-gold-500/10 blur-[130px] rounded-full pointer-events-none"></div>
+    <div className="min-h-screen bg-theme-base text-slate-100 blueprint-grid pb-24 relative overflow-hidden">
+      {/* Subtle CAD Background Grid Glow */}
+      <div className="absolute top-12 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-gradient-to-b from-gold-500/[0.04] to-transparent blur-[140px] pointer-events-none"></div>
+      <div className="absolute top-64 right-10 w-[500px] h-[300px] bg-cyan-500/[0.03] blur-[120px] pointer-events-none"></div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* ======================================================== */}
+      {/* HERO SECTION                                             */}
+      {/* ======================================================== */}
+      <section className="relative pt-6 sm:pt-10 lg:pt-14 pb-16 px-4 sm:px-6 lg:px-8 max-w-[1560px] mx-auto z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 xl:gap-14 items-center">
           {/* Left Hero Content */}
-          <div className="lg:col-span-6 space-y-6 text-center lg:text-left z-10">
-            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-mono tracking-wider shadow-gold-glow">
-              <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-              <span>NEXT-GEN CIVIL BIM & VISUALIZATION PLATFORM</span>
+          <div className="lg:col-span-5 xl:col-span-5 space-y-6 text-center lg:text-left">
+            {/* Engineering Technical Badge */}
+            <div className="inline-flex items-center space-x-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-gold-500/30 text-gold-300 text-xs font-mono shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+                Civil Engineering • 3D BIM Synthesis
+              </span>
             </div>
 
-            <div className="space-y-2">
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-white leading-tight">
-                BUILDVISION <span className="text-gold-gradient">AI</span>
+            {/* Hero Main Headline */}
+            <div className="space-y-3">
+              <h1 className="font-display text-4xl sm:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-[1.08]">
+                See your building <br />
+                <span className="text-gold-gradient">before it is built.</span>
               </h1>
-              <p className="font-display text-xl sm:text-2xl font-semibold text-gold-200/90 tracking-wide italic">
-                “Visualize it. Understand it. Improve it. Then build it.”
+              <p className="text-base sm:text-lg text-slate-300 font-sans font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Transform conceptual briefs or existing structures into cutaway 3D BIM models with live bill-of-quantities (BOQ), material deltas, and construction forecasts.
               </p>
             </div>
 
-            <p className="text-base sm:text-lg text-slate-300 font-light leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Transform building ideas, existing structures, and preliminary plans into interactive 3D construction experiences. Connect architectural design directly with real-time material, cost, and time impacts.
-            </p>
-
             {/* CTAs */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5 pt-2">
               <button
                 onClick={onStartBuilding}
-                className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-600 text-charcoal-950 font-bold text-base shadow-gold-glow hover:brightness-110 active:scale-95 transition-all flex items-center justify-center space-x-3"
+                className="btn-gold w-full sm:w-auto px-7 py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-gold-glow flex items-center justify-center space-x-2.5 cursor-pointer"
               >
                 <span>Start Building Now</span>
-                <ArrowRight className="w-5 h-5 stroke-[2.5]" />
+                <ArrowRight className="w-4 h-4 stroke-[2.5]" />
               </button>
 
               <button
                 onClick={() => onSelectJourney('already_built_changes')}
-                className="w-full sm:w-auto px-6 py-4 rounded-xl glass-panel text-slate-200 hover:text-gold-300 hover:border-gold-500/40 text-sm font-semibold transition-all flex items-center justify-center space-x-2"
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.1] hover:border-cyan-500/40 text-slate-200 hover:text-cyan-300 text-xs font-mono font-semibold transition-all flex items-center justify-center space-x-2 cursor-pointer"
               >
-                <Repeat className="w-4 h-4 text-gold-400" />
-                <span>Test Second Floor Addition</span>
+                <Repeat className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Test 2nd Floor Addition</span>
               </button>
             </div>
 
-            {/* Value Badges */}
-            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-slate-800/80 text-left">
+            {/* Engineering Telemetry Row */}
+            <div className="pt-6 grid grid-cols-3 gap-4 border-t border-white/[0.08] text-left">
               <div>
-                <p className="font-mono text-xl font-bold text-gold-300">3 Journeys</p>
-                <p className="text-xs text-slate-400">Idea, Blueprint or Existing</p>
+                <p className="font-mono text-lg font-bold text-gold-400">3 Workflows</p>
+                <p className="text-[11px] text-slate-400 font-sans">Requirements, Brief, As-Built</p>
               </div>
-              <div>
-                <p className="font-mono text-xl font-bold text-white">Live Delta</p>
-                <p className="text-xs text-slate-400">Instant Cost & Time Impact</p>
+              <div className="border-l border-white/[0.08] pl-4">
+                <p className="font-mono text-lg font-bold text-white">Live Delta</p>
+                <p className="text-[11px] text-slate-400 font-sans">Instant Area & BOQ Impact</p>
               </div>
-              <div>
-                <p className="font-mono text-xl font-bold text-gold-400">AI Civil Robo</p>
-                <p className="text-xs text-slate-400">Educational Planning Mascot</p>
+              <div className="border-l border-white/[0.08] pl-4">
+                <p className="font-mono text-lg font-bold text-cyan-400">AI Civil Robo</p>
+                <p className="text-[11px] text-slate-400 font-sans">Technical Copilot</p>
               </div>
             </div>
           </div>
 
           {/* Right 3D Interactive Hero Preview */}
-          <div className="lg:col-span-6 w-full h-[440px] lg:h-[500px] z-10">
+          <div className="lg:col-span-7 xl:col-span-7 w-full z-10">
             <Hero3DPreview />
           </div>
         </div>
       </section>
 
-      {/* The 3 Core Construction Journeys Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-3xl mx-auto mb-12">
-          <h2 className="text-xs font-mono uppercase tracking-widest text-gold-400 mb-2">
-            TAILORED ENGINEERING PATHWAYS
-          </h2>
-          <p className="text-3xl sm:text-4xl font-display font-bold text-white">
+      {/* ======================================================== */}
+      {/* 3 CORE WORKFLOWS / STARTING POINTS                       */}
+      {/* ======================================================== */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 scroll-mt-20">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-mono uppercase tracking-widest text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20">
+            ENGINEERING PATHWAYS
+          </span>
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mt-3">
             Choose Your Construction Starting Point
-          </p>
-          <p className="text-sm text-slate-400 mt-2">
-            Whether starting from scratch or expanding an existing property, BuildVision AI guides you seamlessly.
+          </h2>
+          <p className="text-sm text-slate-400 mt-2 font-sans">
+            From raw parcel parameters to vertical expansions on existing buildings.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Option 1 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+          {/* Option 1: Requirements to 3D */}
           <div
             onClick={() => onSelectJourney('structure_to_3d')}
-            className="group cursor-pointer rounded-2xl glass-panel p-7 border border-slate-800 hover:border-gold-500/50 hover:shadow-gold-glow transition-all flex flex-col justify-between"
+            className="cad-panel-interactive p-6 flex flex-col justify-between group cursor-pointer"
           >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-charcoal-800 border border-gold-500/30 flex items-center justify-center text-gold-400 mb-5 group-hover:scale-110 transition-transform">
-                <Compass className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-white/[0.04] border border-white/[0.1] group-hover:border-gold-500/50 flex items-center justify-center text-gold-400 mb-5 group-hover:scale-105 transition-all">
+                <Compass className="w-5 h-5" />
               </div>
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">Option 01</span>
-              <h3 className="text-xl font-display font-bold text-white mt-1 group-hover:text-gold-300 transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Option 01</span>
+                <span className="text-[10px] font-mono text-gold-400 bg-gold-500/10 px-2 py-0.5 rounded">Structure → 3D</span>
+              </div>
+              <h3 className="text-xl font-display font-bold text-white mt-2 group-hover:text-gold-200 transition-colors">
                 Don’t Have an Idea?
               </h3>
-              <p className="text-sm font-medium text-gold-400/90 font-mono mt-1">Structure → 3D</p>
-              <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-                Start with your requirements (plot dimensions, budget tier, family size) and let BuildVision AI generate a structurally sound concept.
+              <p className="text-xs text-slate-300 mt-2.5 leading-relaxed font-sans">
+                Start with your core parameters (plot dimensions, budget tier, family size) and let BuildVision synthesize a code-compliant concept.
               </p>
+
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] px-2 py-0.5 rounded text-slate-300">Plot Boundary</span>
+                <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] px-2 py-0.5 rounded text-slate-300">Family Size</span>
+                <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] px-2 py-0.5 rounded text-slate-300">Budget Tier</span>
+              </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-gold-300 font-semibold">
+
+            <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-gold-400 font-semibold font-mono">
               <span>Launch Requirements Flow</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
-          {/* Option 2 */}
+          {/* Option 2: Idea to Structure (Recommended) */}
           <div
             onClick={() => onSelectJourney('idea_to_structure')}
-            className="group cursor-pointer rounded-2xl glass-panel-gold p-7 border border-gold-500/40 hover:shadow-gold-glow-lg transition-all flex flex-col justify-between relative overflow-hidden"
+            className="cad-panel-interactive p-6 flex flex-col justify-between group cursor-pointer border-gold-500/50 relative overflow-hidden"
           >
-            <div className="absolute -right-8 -top-8 w-24 h-24 bg-gold-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <div className="absolute top-0 right-0 bg-gradient-to-l from-gold-500/20 to-transparent w-32 h-16 pointer-events-none"></div>
             <div>
-              <div className="w-12 h-12 rounded-xl bg-gold-500/20 border border-gold-500/40 flex items-center justify-center text-gold-300 mb-5 group-hover:scale-110 transition-transform">
-                <Layers className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-gold-500/15 border border-gold-500/40 flex items-center justify-center text-gold-300 mb-5 group-hover:scale-105 transition-all">
+                <Layers className="w-5 h-5" />
               </div>
-              <span className="text-[11px] font-mono uppercase tracking-wider text-gold-400">Option 02 • Recommended</span>
-              <h3 className="text-xl font-display font-bold text-white mt-1 group-hover:text-gold-300 transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-gold-400 font-bold">Option 02 • Recommended</span>
+                <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded flex items-center space-x-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  <span>BIM Ready</span>
+                </span>
+              </div>
+              <h3 className="text-xl font-display font-bold text-white mt-2 group-hover:text-gold-200 transition-colors">
                 Have an Idea
               </h3>
-              <p className="text-sm font-medium text-gold-300 font-mono mt-1">Idea → Structure → 3D</p>
-              <p className="text-xs text-slate-200 mt-3 leading-relaxed">
+              <p className="text-xs text-slate-200 mt-2.5 leading-relaxed font-sans">
                 Describe your dream home or project (floors, bedrooms, chef kitchen, balconies, parking) and translate it into a coordinate-accurate 3D BIM model.
               </p>
+
+              <div className="mt-4 pt-3 border-t border-gold-500/20 flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-mono bg-gold-500/10 border border-gold-500/30 px-2 py-0.5 rounded text-gold-300">2 Floors</span>
+                <span className="text-[10px] font-mono bg-gold-500/10 border border-gold-500/30 px-2 py-0.5 rounded text-gold-300">Chef Kitchen</span>
+                <span className="text-[10px] font-mono bg-gold-500/10 border border-gold-500/30 px-2 py-0.5 rounded text-gold-300">Balcony</span>
+                <span className="text-[10px] font-mono bg-gold-500/10 border border-gold-500/30 px-2 py-0.5 rounded text-gold-300">Pool & Parking</span>
+              </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-gold-500/20 flex items-center justify-between text-xs text-gold-300 font-bold">
+
+            <div className="mt-6 pt-4 border-t border-gold-500/20 flex items-center justify-between text-xs text-gold-300 font-bold font-mono">
               <span>Start from Idea</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
 
-          {/* Option 3 */}
+          {/* Option 3: Already Built / Add Floor */}
           <div
             onClick={() => onSelectJourney('already_built_changes')}
-            className="group cursor-pointer rounded-2xl glass-panel p-7 border border-slate-800 hover:border-gold-500/50 hover:shadow-gold-glow transition-all flex flex-col justify-between"
+            className="cad-panel-interactive p-6 flex flex-col justify-between group cursor-pointer"
           >
             <div>
-              <div className="w-12 h-12 rounded-xl bg-charcoal-800 border border-gold-500/30 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-110 transition-transform">
-                <Repeat className="w-6 h-6" />
+              <div className="w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-5 group-hover:scale-105 transition-all">
+                <Repeat className="w-5 h-5" />
               </div>
-              <span className="text-[11px] font-mono uppercase tracking-wider text-slate-400">Option 03</span>
-              <h3 className="text-xl font-display font-bold text-white mt-1 group-hover:text-gold-300 transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400">Option 03</span>
+                <span className="text-[10px] font-mono text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded">Before / After</span>
+              </div>
+              <h3 className="text-xl font-display font-bold text-white mt-2 group-hover:text-cyan-200 transition-colors">
                 Already Built
               </h3>
-              <p className="text-sm font-medium text-cyan-300 font-mono mt-1">Changes / Add Floor → 3D</p>
-              <p className="text-xs text-slate-300 mt-3 leading-relaxed">
-                Start with your existing building and visualize proposed changes: add an entire second floor, cantilever a balcony, extend rooms, and see Before vs After.
+              <p className="text-xs text-slate-300 mt-2.5 leading-relaxed font-sans">
+                Start with your existing building and visualize proposed changes: add an entire second floor, cantilever a balcony, extend rooms, and see live Before vs After.
               </p>
+
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex flex-wrap gap-1.5">
+                <span className="text-[10px] font-mono bg-cyan-500/10 border border-cyan-500/30 px-2 py-0.5 rounded text-cyan-300">Add Second Floor</span>
+                <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] px-2 py-0.5 rounded text-slate-300">Cantilever Balcony</span>
+                <span className="text-[10px] font-mono bg-white/[0.03] border border-white/[0.08] px-2 py-0.5 rounded text-slate-300">Room Extension</span>
+              </div>
             </div>
-            <div className="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-cyan-300 font-semibold">
+
+            <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center justify-between text-xs text-cyan-300 font-semibold font-mono">
               <span>Compare Existing vs Proposed</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
@@ -197,39 +239,43 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* How It Works (7 Step Architectural Pipeline) */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="text-center max-w-2xl mx-auto mb-14">
-          <span className="text-xs font-mono uppercase tracking-widest text-gold-400">
-            ENGINEERING WORKFLOW
+      {/* ======================================================== */}
+      {/* 8-STEP ARCHITECTURAL PIPELINE (BALANCED GRID)            */}
+      {/* ======================================================== */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10 scroll-mt-20">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <span className="text-xs font-mono uppercase tracking-widest text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20">
+            END-TO-END PIPELINE
           </span>
-          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mt-1">
+          <h2 className="text-3xl sm:text-4xl font-display font-bold text-white mt-3">
             How BuildVision AI Works
           </h2>
-          <p className="text-xs text-slate-400 mt-2">
-            A unified end-to-end workflow from conceptual visualization to client sign-off.
+          <p className="text-xs text-slate-400 mt-2 font-sans">
+            A seamless bridge from conceptual design to engineering estimates and client approval.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {steps.map((step, idx) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+          {steps.map((step) => {
             const Icon = step.icon;
             return (
               <div
                 key={step.num}
-                className="relative rounded-xl glass-panel p-5 border border-slate-800/80 hover:border-gold-500/30 transition-all flex flex-col justify-between group"
+                className="cad-panel p-5 flex flex-col justify-between group hover:border-gold-500/40 transition-colors"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-mono font-bold text-gold-400/80 bg-gold-500/10 px-2.5 py-1 rounded-md border border-gold-500/20">
+                  <div className="flex items-center justify-between mb-3.5">
+                    <span className="text-[11px] font-mono font-bold text-gold-400 bg-gold-500/10 px-2 py-0.5 rounded border border-gold-500/20">
                       STEP {step.num}
                     </span>
-                    <Icon className="w-5 h-5 text-slate-400 group-hover:text-gold-300 transition-colors" />
+                    <Icon className="w-4 h-4 text-slate-400 group-hover:text-gold-300 transition-colors" />
                   </div>
-                  <h4 className="text-base font-display font-semibold text-white group-hover:text-gold-200 transition-colors">
+                  <h4 className="text-sm font-display font-semibold text-white group-hover:text-gold-100 transition-colors">
                     {step.title}
                   </h4>
-                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">{step.desc}</p>
+                  <p className="text-xs text-slate-400 mt-2 leading-relaxed font-sans">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
             );
@@ -237,55 +283,63 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Differentiating Features Showcase */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="rounded-3xl glass-panel-gold p-8 sm:p-12 border border-gold-500/30 relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div className="space-y-5">
+      {/* ======================================================== */}
+      {/* AI CIVIL COPILOT SPOTLIGHT                               */}
+      {/* ======================================================== */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative z-10">
+        <div className="cad-panel p-8 sm:p-12 border-gold-500/30 relative overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Mascot description */}
+            <div className="lg:col-span-7 space-y-5">
               <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-gold-500/10 border border-gold-500/30 text-gold-300 text-xs font-mono">
                 <Bot className="w-3.5 h-3.5 text-gold-400" />
                 <span>INTELLIGENT CIVIL COPILOT</span>
               </div>
-              <h3 className="text-3xl font-display font-bold text-white">
-                Meet Your Floating AI Civil Engineer Mascot
+              <h3 className="text-2xl sm:text-3xl font-display font-bold text-white">
+                Meet Your Built-In AI Civil Engineer
               </h3>
-              <p className="text-sm text-slate-300 leading-relaxed">
-                Positioned unobtrusively at the corner of your screen, our tiny metallic Civil Robo explains complex architectural nuances in plain English for clients and homeowners.
+              <p className="text-sm text-slate-300 leading-relaxed font-sans">
+                Accessible anywhere in the workspace, the Civil Robo mascot explains structural engineering logic, verifies load-bearing constraints, calculates material volumes, and translates complex jargon for clients.
               </p>
-              <ul className="space-y-2.5 text-xs text-slate-200">
-                <li className="flex items-center space-x-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs text-slate-300">
+                <div className="flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Context-aware: Automatically knows which floor and room you are viewing</span>
-                </li>
-                <li className="flex items-center space-x-2">
+                  <span>Context-aware of selected floor & room</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span>Explains RCC, plinth & cantilever limits</span>
+                </div>
+                <div className="flex items-center space-x-2">
                   <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Explains civil terms: RCC, plinth beams, shear walls, and cantilever limits</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <CheckCircle2 className="w-4 h-4 text-gold-400 shrink-0" />
-                  <span>Clear preliminary guidance disclaimer ensuring client transparency</span>
-                </li>
-              </ul>
+                  <span>Turnkey BOQ price & material breakdown</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>IS-456 & NBC architectural compliance</span>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <div className="p-5 rounded-2xl bg-charcoal-900/90 border border-gold-500/20">
-                <div className="flex items-center space-x-3 mb-2">
-                  <Ruler className="w-5 h-5 text-gold-400" />
-                  <h4 className="text-sm font-semibold text-white">Instant Change Impact Analysis</h4>
+            {/* Feature Highlights Cards */}
+            <div className="lg:col-span-5 space-y-4">
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-gold-500/20">
+                <div className="flex items-center space-x-2.5 mb-1.5">
+                  <Ruler className="w-4 h-4 text-gold-400" />
+                  <h4 className="text-sm font-semibold text-white font-sans">Live Change Impact Drawer</h4>
                 </div>
-                <p className="text-xs text-slate-300">
-                  Resize any bedroom or add a terrace — watch the exact delta update live: +45 sq.ft floor area, +18 bags cement, +₹1,20,000 cost, and +6 construction days.
+                <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                  Modify any wall or add a room — immediately inspect the exact delta: floor area (+45 sq.ft), cement bags (+18), cost (+₹1,20,000), and schedule (+6 days).
                 </p>
               </div>
 
-              <div className="p-5 rounded-2xl bg-charcoal-900/90 border border-gold-500/20">
-                <div className="flex items-center space-x-3 mb-2">
-                  <Presentation className="w-5 h-5 text-gold-400" />
-                  <h4 className="text-sm font-semibold text-white">One-Click Client Presentation Mode</h4>
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-cyan-500/20">
+                <div className="flex items-center space-x-2.5 mb-1.5">
+                  <Presentation className="w-4 h-4 text-cyan-400" />
+                  <h4 className="text-sm font-semibold text-white font-sans">Distraction-Free Presentation</h4>
                 </div>
-                <p className="text-xs text-slate-300">
-                  Hide all technical editors and switch to an executive presentation viewport with auto-rotating models, Before/After toggle, and commercial estimates.
+                <p className="text-xs text-slate-400 leading-relaxed font-sans">
+                  Switch from engineering CAD tools to an executive pitch viewport with smooth orbit camera, high-resolution cutaways, and Before/After ghost overlays.
                 </p>
               </div>
             </div>
@@ -293,22 +347,41 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </section>
 
-      {/* Bottom CTA Banner */}
-      <section className="pt-10 px-4 max-w-4xl mx-auto text-center">
-        <h2 className="text-3xl font-display font-bold text-white">
-          Ready to visualize and plan your next building?
+      {/* ======================================================== */}
+      {/* BOTTOM CTA & FOOTER                                      */}
+      {/* ======================================================== */}
+      <section className="pt-8 pb-16 px-4 max-w-4xl mx-auto text-center relative z-10">
+        <h2 className="text-3xl sm:text-4xl font-display font-bold text-white">
+          Ready to visualize your next building?
         </h2>
-        <p className="text-xs sm:text-sm text-slate-300 mt-2 max-w-xl mx-auto">
-          Start your journey with BuildVision AI and go from an idea or existing property to an interactive 3D model with preliminary BOQ estimates.
+        <p className="text-sm text-slate-300 mt-2.5 max-w-lg mx-auto font-sans">
+          Start from an idea, spatial parameters, or an existing structure to generate coordinate-accurate 3D BIM models with turnkey estimates.
         </p>
         <button
           onClick={onStartBuilding}
-          className="mt-6 px-8 py-3.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-charcoal-950 font-bold text-sm shadow-gold-glow hover:brightness-110 active:scale-95 transition-all inline-flex items-center space-x-2"
+          className="btn-gold mt-6 px-8 py-3.5 rounded-xl font-bold text-sm tracking-wide shadow-gold-glow inline-flex items-center space-x-2 cursor-pointer"
         >
-          <span>Open BuildVision Workspace</span>
+          <span>Open Projects Dashboard</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </section>
+
+      {/* Engineering Footer */}
+      <footer className="border-t border-white/[0.08] max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 pt-8 text-xs text-slate-400 font-mono flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex items-center space-x-2">
+          <Building2 className="w-4 h-4 text-gold-400" />
+          <span className="text-slate-300 font-bold">BUILDVISION AI</span>
+          <span className="text-slate-600">|</span>
+          <span>Architectural Synthesis & Civil Engineering</span>
+        </div>
+        <div className="flex items-center space-x-4 text-[11px]">
+          <span>3D BIM Engine v2.0</span>
+          <span>•</span>
+          <span>Neon PostgreSQL Authenticated</span>
+          <span>•</span>
+          <span>Turnkey BOQ Formulation</span>
+        </div>
+      </footer>
     </div>
   );
 };

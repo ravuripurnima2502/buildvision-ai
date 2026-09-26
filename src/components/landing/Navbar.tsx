@@ -1,7 +1,16 @@
 import React from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { useTheme } from '../theme/ThemeContext';
-import { Building2, LogOut, Sparkles, FolderKanban, Palette } from 'lucide-react';
+import {
+  Layers,
+  LogOut,
+  FolderKanban,
+  Palette,
+  ChevronRight,
+  User,
+  ShieldCheck,
+  Building,
+} from 'lucide-react';
 
 interface NavbarProps {
   onOpenAuth: (mode?: 'login' | 'register') => void;
@@ -20,86 +29,135 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { currentTheme } = useTheme();
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-theme-subtle bg-theme-surface/85 backdrop-blur-xl">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo */}
+    <header className="sticky top-0 z-40 w-full border-b border-white/[0.07] bg-theme-base/80 backdrop-blur-xl transition-colors duration-200 select-none">
+      <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Brand Logo & Architectural Mark */}
         <div
           onClick={() => onNavigate('landing')}
-          className="flex items-center space-x-3 cursor-pointer group"
+          className="flex items-center space-x-3.5 cursor-pointer group"
+          role="button"
+          aria-label="BuildVision AI Home"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-700 flex items-center justify-center shadow-gold-glow group-hover:scale-105 transition-transform">
-            <Building2 className="w-6 h-6 text-charcoal-950 stroke-[2.4]" />
+          {/* Geometric Structural Mark */}
+          <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-charcoal-800 to-charcoal-900 border border-gold-500/40 flex items-center justify-center shadow-gold-glow group-hover:border-gold-400 group-hover:scale-105 transition-all duration-300">
+            {/* Architectural Isometric Wireframe Icon */}
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              className="w-5 h-5 text-gold-400 group-hover:text-gold-300 transition-colors"
+              stroke="currentColor"
+              strokeWidth="1.75"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+              <path d="M12 22V12" strokeDasharray="1 1" />
+            </svg>
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-charcoal-950"></span>
           </div>
+
           <div className="flex flex-col">
-            <span className="font-display font-bold text-lg tracking-wider text-theme-primary flex items-center">
-              BUILDVISION <span className="text-gold-400 ml-1">AI</span>
-            </span>
-            <span className="text-[10px] text-theme-secondary uppercase tracking-widest font-mono">
-              Visualize • Understand • Build
+            <div className="flex items-center space-x-1.5">
+              <span className="font-display font-bold text-base tracking-tight text-white group-hover:text-gold-100 transition-colors">
+                BUILDVISION
+              </span>
+              <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-gold-500/20 text-gold-400 border border-gold-500/40">
+                AI
+              </span>
+            </div>
+            <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase font-medium">
+              Civil BIM & Architectural Studio
             </span>
           </div>
         </div>
 
-        {/* Navigation Actions */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Theme Switcher Button */}
+        {/* Center / Navigation Links (Desktop) */}
+        <nav className="hidden lg:flex items-center space-x-1 bg-white/[0.03] p-1 rounded-xl border border-white/[0.06]">
+          <button
+            onClick={() => onNavigate('landing')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              currentView === 'landing'
+                ? 'bg-white/[0.08] text-white shadow-sm font-semibold'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+            }`}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => onNavigate('dashboard')}
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center space-x-1.5 ${
+              currentView === 'dashboard'
+                ? 'bg-gold-500/20 text-gold-300 border border-gold-500/30 shadow-gold-glow font-semibold'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.03]'
+            }`}
+          >
+            <FolderKanban className="w-3.5 h-3.5 text-gold-400" />
+            <span>Projects Dashboard</span>
+          </button>
+        </nav>
+
+        {/* Right Action Hub */}
+        <div className="flex items-center space-x-2.5 sm:space-x-3">
+          {/* Theme Palette Quick Selector */}
           <button
             onClick={onOpenThemeSelector}
-            title={`Theme: ${currentTheme.name} (Click to change)`}
-            className="p-2 rounded-xl border border-theme-subtle hover:border-gold-500/50 bg-theme-surface hover:bg-gold-500/10 text-theme-secondary hover:text-gold-400 transition-all flex items-center space-x-1.5 shadow-sm"
+            title={`Current Theme: ${currentTheme.name} (Click to customize)`}
+            className="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border border-white/[0.08] hover:border-gold-500/40 bg-white/[0.03] hover:bg-gold-500/10 text-slate-300 hover:text-gold-300 transition-all text-xs font-mono cursor-pointer"
           >
-            <Palette className="w-4 h-4 text-gold-400" />
-            <span className="text-xs font-mono hidden md:inline">{currentTheme.name.split(' ')[0]}</span>
+            <Palette className="w-3.5 h-3.5 text-gold-400" />
+            <span className="hidden md:inline text-[11px] font-medium">{currentTheme.name.split(' ')[0]}</span>
           </button>
 
           {isAuthenticated ? (
-            <>
-              <button
+            <div className="flex items-center space-x-2.5 sm:space-x-3 pl-2 sm:pl-3 border-l border-white/[0.08]">
+              {/* User Identity Pill */}
+              <div
                 onClick={() => onNavigate('dashboard')}
-                className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold tracking-wide transition-all ${
-                  currentView === 'dashboard'
-                    ? 'bg-gold-500/20 text-gold-400 border border-gold-500/40 shadow-gold-glow'
-                    : 'text-theme-secondary hover:text-theme-primary hover:bg-black/10'
-                }`}
+                className="flex items-center space-x-2.5 px-2.5 py-1 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:border-gold-500/30 cursor-pointer transition-all"
               >
-                <FolderKanban className="w-4 h-4 text-gold-400" />
-                <span className="hidden sm:inline">Projects Dashboard</span>
-              </button>
-
-              <div className="flex items-center space-x-3 pl-3 border-l border-theme-subtle">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 rounded-full bg-gold-500/20 border border-gold-500/30 flex items-center justify-center text-gold-400 text-xs font-bold font-mono">
-                    {user?.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="hidden md:block text-left">
-                    <p className="text-xs font-medium text-theme-primary leading-tight">{user?.name}</p>
-                    <p className="text-[10px] text-theme-secondary leading-tight">{user?.company || user?.email}</p>
-                  </div>
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-gold-500/30 to-amber-500/10 border border-gold-500/40 flex items-center justify-center text-gold-300 text-xs font-bold font-mono">
+                  {user?.name ? user.name.trim().charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : 'U')}
                 </div>
-
-                <button
-                  onClick={logout}
-                  title="Sign Out"
-                  className="p-2 rounded-lg text-theme-secondary hover:text-red-400 hover:bg-black/10 transition-colors"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
+                <div className="hidden md:block text-left pr-1">
+                  <p className="text-xs font-semibold text-white leading-tight truncate max-w-[120px]">
+                    {user?.name || user?.email?.split('@')[0] || 'Engineer'}
+                  </p>
+                  <p className="text-[9px] text-cyan-400 font-mono leading-tight flex items-center space-x-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyan-400"></span>
+                    <span>Neon DB</span>
+                  </p>
+                </div>
               </div>
-            </>
+
+              {/* Logout Button */}
+              <button
+                onClick={async () => {
+                  await logout();
+                  window.location.hash = '#/';
+                }}
+                title="Sign Out"
+                className="p-2 rounded-xl text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all cursor-pointer"
+                aria-label="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
           ) : (
             <div className="flex items-center space-x-2 sm:space-x-3">
               <button
                 onClick={() => onOpenAuth('login')}
-                className="text-xs font-semibold text-theme-secondary hover:text-gold-400 px-2 sm:px-3 py-2 transition-colors"
+                className="text-xs font-semibold text-slate-300 hover:text-white px-3 py-2 transition-colors cursor-pointer"
               >
                 Sign In
               </button>
               <button
                 onClick={() => onOpenAuth('register')}
-                className="flex items-center space-x-1.5 px-3.5 sm:px-4 py-2 rounded-xl bg-gradient-to-r from-gold-500 to-gold-600 text-charcoal-950 text-xs font-bold tracking-wide shadow-gold-glow hover:brightness-110 active:scale-95 transition-all"
+                className="btn-gold flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold tracking-wide shadow-gold-glow cursor-pointer"
               >
                 <span>Get Started</span>
-                <Sparkles className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
           )}

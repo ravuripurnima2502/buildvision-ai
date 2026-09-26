@@ -11,6 +11,7 @@ import {
   AlertCircle,
   PieChart,
   DollarSign,
+  TrendingUp,
 } from 'lucide-react';
 
 interface CostBreakdownProps {
@@ -37,14 +38,15 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Animated Hero Card: Total Preliminary Estimate */}
-      <div className="rounded-3xl glass-panel-gold p-6 sm:p-8 border border-gold-500/40 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* Hero Card: Total Turnkey Forecast */}
+      <div className="rounded-3xl bg-[#0B1017]/95 p-6 sm:p-8 border border-gold-500/40 relative overflow-hidden shadow-2xl">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div className="md:col-span-7 space-y-2">
-            <span className="text-xs font-mono uppercase tracking-widest text-gold-400 bg-gold-500/15 px-3 py-1 rounded-full border border-gold-500/30">
-              PRELIMINARY ESTIMATE SUMMARY
+            <span className="text-[10px] font-mono uppercase tracking-widest text-gold-400 bg-gold-500/10 px-3 py-1 rounded-full border border-gold-500/20 font-semibold inline-flex items-center space-x-1.5">
+              <TrendingUp className="w-3 h-3" />
+              <span>PRELIMINARY TURNKEY FORECAST</span>
             </span>
             <div className="pt-2">
               <span className="text-3xl sm:text-5xl font-display font-bold text-white tracking-tight">
@@ -54,33 +56,33 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({
                 ({formatCompactNumber(totalCost)})
               </span>
             </div>
-            <p className="text-xs text-slate-300 max-w-lg">
-              Comprehensive turnkey forecast encompassing substructure, RCC framed super-structure, AAC block masonry, high-grade finishes, and electrical & plumbing installations.
+            <p className="text-xs text-slate-300 max-w-lg leading-relaxed">
+              Comprehensive turnkey budget encompassing RCC framed structural shell, AAC block masonry, high-grade floor & wall finishes, architectural glazing, and electrical & plumbing conduits.
             </p>
           </div>
 
           <div className="md:col-span-5 grid grid-cols-2 gap-3">
-            <div className="p-3.5 rounded-2xl bg-charcoal-900/90 border border-slate-800">
-              <span className="text-[10px] uppercase font-mono text-slate-400 block">Cost / sq.ft</span>
-              <span className="text-lg font-display font-bold text-gold-300 mt-0.5 block">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[10px] uppercase font-mono text-slate-400 block">Unit Cost / sq.ft</span>
+              <span className="text-xl font-display font-bold text-gold-300 mt-0.5 block">
                 ₹{costPerSqFt.toLocaleString()}
               </span>
-              <span className="text-[10px] text-slate-500">Premium Residential</span>
+              <span className="text-[10px] text-slate-500 font-mono">Standard Grade B+</span>
             </div>
 
-            <div className="p-3.5 rounded-2xl bg-charcoal-900/90 border border-slate-800">
-              <span className="text-[10px] uppercase font-mono text-slate-400 block">Built-Up Area</span>
-              <span className="text-lg font-display font-bold text-white mt-0.5 block">
+            <div className="p-4 rounded-2xl bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[10px] uppercase font-mono text-slate-400 block">Total Built-Up</span>
+              <span className="text-xl font-display font-bold text-white mt-0.5 block">
                 {builtUpAreaSqFt.toLocaleString()} sq.ft
               </span>
-              <span className="text-[10px] text-slate-500">{(builtUpAreaSqFt * 0.0929).toFixed(0)} m²</span>
+              <span className="text-[10px] text-slate-500 font-mono">{(builtUpAreaSqFt * 0.0929).toFixed(0)} m² gross</span>
             </div>
           </div>
         </div>
 
         {/* Progress Ratio Bar */}
-        <div className="mt-6 pt-6 border-t border-gold-500/20">
-          <div className="h-3 rounded-full overflow-hidden flex bg-charcoal-900">
+        <div className="mt-6 pt-6 border-t border-white/[0.08]">
+          <div className="h-2.5 rounded-full overflow-hidden flex bg-white/[0.06]">
             {categories.map((cat) => (
               <div
                 key={cat.id}
@@ -90,11 +92,11 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({
               />
             ))}
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2 mt-2.5">
+          <div className="flex flex-wrap items-center justify-between gap-2 mt-3">
             {categories.map((cat) => (
               <div key={cat.id} className="flex items-center space-x-1.5 text-[11px]">
                 <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: cat.color }}></span>
-                <span className="text-slate-300">{cat.name} ({cat.percentage}%)</span>
+                <span className="text-slate-300 font-mono">{cat.name} ({cat.percentage}%)</span>
               </div>
             ))}
           </div>
@@ -108,26 +110,26 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({
           return (
             <div
               key={cat.id}
-              className="p-5 rounded-2xl glass-panel border border-slate-800/80 hover:border-gold-500/30 transition-all flex flex-col justify-between"
+              className="p-5 rounded-2xl cad-panel hover:border-gold-500/40 transition-all flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center border"
-                    style={{ backgroundColor: `${cat.color}20`, borderColor: `${cat.color}40`, color: cat.color }}
+                    style={{ backgroundColor: `${cat.color}15`, borderColor: `${cat.color}35`, color: cat.color }}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-5 h-5 stroke-[2.2]" />
                   </div>
-                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-charcoal-900 text-slate-300 border border-slate-800">
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-300 border border-white/[0.08]">
                     {cat.percentage}%
                   </span>
                 </div>
 
-                <h4 className="text-sm font-display font-bold text-white">{cat.name}</h4>
+                <h4 className="text-base font-display font-bold text-white">{cat.name}</h4>
                 <p className="text-xs text-slate-400 mt-1 leading-relaxed">{cat.description}</p>
               </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between">
+              <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
                 <span className="text-[10px] uppercase font-mono text-slate-500">Allocated Budget</span>
                 <span className="text-sm font-mono font-bold text-gold-300">
                   {formatCurrency(cat.amount)}
@@ -138,14 +140,14 @@ export const CostBreakdown: React.FC<CostBreakdownProps> = ({
         })}
       </div>
 
-      {/* Prominent Required Disclaimer */}
-      <div className="p-4 rounded-2xl bg-charcoal-900/90 border border-amber-500/30 flex items-start space-x-3 text-xs text-amber-200/90">
+      {/* Engineering Disclaimer */}
+      <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-start space-x-3 text-xs text-amber-200/90">
         <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
         <div>
           <span className="font-bold uppercase tracking-wider block font-mono text-[10px] text-amber-300">
             Professional Engineering Notice:
           </span>
-          “Preliminary estimate — actual cost depends on site conditions, design, material rates and professional assessment.”
+          “Preliminary estimate based on parametric BIM calculations — actual cost depends on soil conditions, local vendor quotes, material grade selections, and site accessibility.”
         </div>
       </div>
     </div>

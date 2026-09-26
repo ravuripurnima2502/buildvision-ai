@@ -189,37 +189,59 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-2xl rounded-2xl glass-panel-gold p-6 sm:p-8 border border-gold-500/30 blueprint-grid shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl animate-fadeIn select-none">
+      <div className="relative w-full max-w-2xl rounded-2xl bg-[#0B1017]/95 border border-white/[0.1] shadow-card-elevated p-6 sm:p-8 overflow-hidden">
         {/* Close Button */}
         <button
           onClick={onClose}
           disabled={isGenerating}
-          className="absolute top-5 right-5 text-slate-400 hover:text-gold-300 transition-colors"
+          className="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
 
-        {/* Wizard Header */}
-        <div className="mb-6">
-          <div className="flex items-center space-x-2 text-xs font-mono text-gold-400 uppercase tracking-wider mb-1">
+        {/* Wizard Header & Stepper */}
+        <div className="mb-6 space-y-3">
+          <div className="flex items-center space-x-2 text-xs font-mono text-gold-400 uppercase tracking-wider">
             {journeyType === 'structure_to_3d' && <Compass className="w-4 h-4" />}
             {journeyType === 'idea_to_structure' && <Layers className="w-4 h-4" />}
             {journeyType === 'already_built_changes' && <Repeat className="w-4 h-4 text-cyan-400" />}
             <span>
-              {journeyType === 'structure_to_3d' && 'Option 1: Structure → 3D'}
-              {journeyType === 'idea_to_structure' && 'Option 2: Idea → Structure → 3D'}
-              {journeyType === 'already_built_changes' && 'Option 3: Already Built → Changes'}
+              {journeyType === 'structure_to_3d' && 'Option 01: Requirements → 3D'}
+              {journeyType === 'idea_to_structure' && 'Option 02: Idea → Structure → 3D'}
+              {journeyType === 'already_built_changes' && 'Option 03: Existing → Changes'}
             </span>
-            <span className="text-slate-500">•</span>
-            <span>Step {step} of {totalSteps}</span>
           </div>
 
-          <h2 className="text-2xl font-display font-bold text-white">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-white tracking-tight">
             {journeyType === 'already_built_changes'
               ? 'Visualize Additions & Structural Changes'
               : 'Project Configuration & Requirements'}
           </h2>
+
+          {/* Stepper Progress Bar */}
+          <div className="grid grid-cols-3 gap-2 pt-1">
+            {[
+              { id: 1, label: 'Parameters' },
+              { id: 2, label: 'Spatial Brief' },
+              { id: 3, label: 'Synthesis' },
+            ].map((s) => (
+              <div key={s.id} className="space-y-1">
+                <div
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    step >= s.id
+                      ? 'bg-gradient-to-r from-gold-500 to-gold-400 shadow-gold-glow'
+                      : 'bg-white/[0.08]'
+                  }`}
+                ></div>
+                <div className="flex items-center justify-between text-[10px] font-mono">
+                  <span className={step >= s.id ? 'text-gold-300 font-semibold' : 'text-slate-500'}>
+                    0{s.id}. {s.label}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Loading / Generating State */}
@@ -255,7 +277,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         ? 'e.g. Existing Bungalow — Second Floor Proposal'
                         : 'e.g. Modern Minimalist Villa'
                     }
-                    className="w-full bg-charcoal-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
+                    className="w-full bg-[#070A0F] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 transition-colors"
                   />
                 </div>
 
@@ -271,7 +293,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         max={30}
                         value={plotWidth}
                         onChange={(e) => setPlotWidth(Number(e.target.value))}
-                        className="w-full bg-charcoal-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 font-mono"
+                        className="w-full bg-[#070A0F] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 font-mono transition-colors"
                       />
                       <span className="absolute right-3 top-2.5 text-xs text-slate-500 font-mono">
                         ≈ {(plotWidth * 3.28084).toFixed(0)} ft
@@ -290,7 +312,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         max={40}
                         value={plotLength}
                         onChange={(e) => setPlotLength(Number(e.target.value))}
-                        className="w-full bg-charcoal-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 font-mono"
+                        className="w-full bg-[#070A0F] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-gold-500 font-mono transition-colors"
                       />
                       <span className="absolute right-3 top-2.5 text-xs text-slate-500 font-mono">
                         ≈ {(plotLength * 3.28084).toFixed(0)} ft
@@ -309,10 +331,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         key={p}
                         type="button"
                         onClick={() => setPurpose(p)}
-                        className={`py-2.5 px-3 rounded-xl border text-xs font-semibold capitalize transition-all ${
+                        className={`py-2.5 px-3 rounded-xl border text-xs font-semibold capitalize transition-all cursor-pointer ${
                           purpose === p
                             ? 'bg-gold-500/20 border-gold-500 text-gold-300 shadow-gold-glow'
-                            : 'bg-charcoal-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                            : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
                         }`}
                       >
                         {p}
@@ -336,10 +358,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         <button
                           type="button"
                           onClick={() => setExistingFloors(1)}
-                          className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                          className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                             existingFloors === 1
                               ? 'bg-cyan-950/40 border-cyan-500 text-white'
-                              : 'bg-charcoal-900 border-slate-800 text-slate-400'
+                              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:bg-white/[0.04]'
                           }`}
                         >
                           <span className="font-bold block text-sm">Ground Floor Only</span>
@@ -348,10 +370,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         <button
                           type="button"
                           onClick={() => setExistingFloors(2)}
-                          className={`p-3 rounded-xl border text-left text-xs transition-all ${
+                          className={`p-3 rounded-xl border text-left text-xs transition-all cursor-pointer ${
                             existingFloors === 2
                               ? 'bg-cyan-950/40 border-cyan-500 text-white'
-                              : 'bg-charcoal-900 border-slate-800 text-slate-400'
+                              : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:bg-white/[0.04]'
                           }`}
                         >
                           <span className="font-bold block text-sm">G + 1 Existing</span>
@@ -393,7 +415,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                             className={`p-3.5 rounded-xl border cursor-pointer transition-all flex items-start space-x-3 ${
                               selectedProposedChange === item.id
                                 ? 'bg-gold-500/15 border-gold-500 text-white shadow-gold-glow'
-                                : 'bg-charcoal-900 border-slate-800 text-slate-400 hover:border-slate-700'
+                                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:border-white/[0.15]'
                             }`}
                           >
                             <div className={`w-5 h-5 rounded-full mt-0.5 flex items-center justify-center shrink-0 border ${
@@ -420,7 +442,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                       value={ideaPrompt}
                       onChange={(e) => setIdeaPrompt(e.target.value)}
                       placeholder="e.g. 2 floors, master bedroom on first floor with large balcony, open kitchen next to living room, parking for SUV..."
-                      className="w-full bg-charcoal-900 border border-slate-700 rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500"
+                      className="w-full bg-[#070A0F] border border-white/[0.1] rounded-xl p-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 transition-colors"
                     />
                     <div className="flex flex-wrap gap-2 mt-2">
                       {[
@@ -433,7 +455,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                           key={chip}
                           type="button"
                           onClick={() => setIdeaPrompt(prev => `${prev} ${chip}.`)}
-                          className="text-[11px] px-2.5 py-1 rounded-lg bg-charcoal-800 hover:bg-gold-500/20 text-slate-300 hover:text-gold-300 border border-slate-700 transition-colors"
+                          className="text-[11px] px-2.5 py-1 rounded-lg bg-white/[0.03] hover:bg-gold-500/20 text-slate-300 hover:text-gold-300 border border-white/[0.08] transition-colors cursor-pointer"
                         >
                           + {chip}
                         </button>
@@ -452,13 +474,13 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                             key={fl}
                             type="button"
                             onClick={() => setFloorsCount(fl)}
-                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                               floorsCount === fl
                                 ? 'bg-gold-500/20 border-gold-500 text-gold-300 shadow-gold-glow'
-                                : 'bg-charcoal-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200'
                             }`}
                           >
-                            {fl} {fl === 1 ? 'Floor (Bungalow)' : 'Floors'}
+                            {fl} {fl === 1 ? 'Floor' : 'Floors'}
                           </button>
                         ))}
                       </div>
@@ -474,10 +496,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                             key={bhk}
                             type="button"
                             onClick={() => setBedroomsCount(bhk)}
-                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                            className={`flex-1 py-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                               bedroomsCount === bhk
                                 ? 'bg-gold-500/20 border-gold-500 text-gold-300 shadow-gold-glow'
-                                : 'bg-charcoal-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                                : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200'
                             }`}
                           >
                             {bhk} BHK
@@ -497,10 +519,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                     <button
                       type="button"
                       onClick={() => setHasParking(!hasParking)}
-                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all ${
+                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
                         hasParking
                           ? 'bg-gold-500/15 border-gold-500/60 text-white'
-                          : 'bg-charcoal-900 border-slate-800 text-slate-500'
+                          : 'bg-white/[0.02] border-white/[0.08] text-slate-500'
                       }`}
                     >
                       <span className="flex items-center space-x-1.5">
@@ -513,10 +535,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                     <button
                       type="button"
                       onClick={() => setHasBalcony(!hasBalcony)}
-                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all ${
+                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
                         hasBalcony
                           ? 'bg-gold-500/15 border-gold-500/60 text-white'
-                          : 'bg-charcoal-900 border-slate-800 text-slate-500'
+                          : 'bg-white/[0.02] border-white/[0.08] text-slate-500'
                       }`}
                     >
                       <span className="flex items-center space-x-1.5">
@@ -529,10 +551,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                     <button
                       type="button"
                       onClick={() => setHasGardenTerrace(!hasGardenTerrace)}
-                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all ${
+                      className={`p-2.5 rounded-xl border text-xs font-medium flex items-center justify-between transition-all cursor-pointer ${
                         hasGardenTerrace
                           ? 'bg-gold-500/15 border-gold-500/60 text-white'
-                          : 'bg-charcoal-900 border-slate-800 text-slate-500'
+                          : 'bg-white/[0.02] border-white/[0.08] text-slate-500'
                       }`}
                     >
                       <span className="flex items-center space-x-1.5">
@@ -563,10 +585,10 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                         key={st.id}
                         type="button"
                         onClick={() => setArchitecturalStyle(st.id as any)}
-                        className={`p-3 rounded-xl border text-left transition-all ${
+                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                           architecturalStyle === st.id
                             ? 'bg-gold-500/20 border-gold-500 text-gold-300 shadow-gold-glow'
-                            : 'bg-charcoal-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                            : 'bg-white/[0.02] border-white/[0.08] text-slate-400 hover:text-slate-200'
                         }`}
                       >
                         <span className="text-xs font-bold block">{st.title}</span>
@@ -576,7 +598,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                   </div>
                 </div>
 
-                <div className="p-4 rounded-xl bg-charcoal-900/90 border border-gold-500/30 space-y-2">
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-gold-500/30 space-y-2">
                   <h4 className="text-xs font-mono uppercase tracking-wider text-gold-400 flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 text-gold-400" />
                     <span>Synthesis Summary</span>
@@ -600,12 +622,12 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
             )}
 
             {/* Navigation Controls */}
-            <div className="mt-8 pt-4 border-t border-slate-800 flex items-center justify-between">
+            <div className="mt-8 pt-4 border-t border-white/[0.08] flex items-center justify-between">
               {step > 1 ? (
                 <button
                   type="button"
                   onClick={() => setStep(step - 1)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-charcoal-800 transition-colors flex items-center space-x-1.5"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors flex items-center space-x-1.5 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   <span>Back</span>
@@ -614,7 +636,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -625,7 +647,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                   <button
                     type="button"
                     onClick={() => setStep(step + 1)}
-                    className="px-6 py-2.5 rounded-xl bg-gold-500 text-charcoal-950 text-xs font-bold tracking-wide shadow-gold-glow hover:brightness-110 active:scale-95 transition-all flex items-center space-x-2"
+                    className="btn-gold px-6 py-2.5 rounded-xl text-xs font-bold tracking-wide shadow-gold-glow flex items-center space-x-2 cursor-pointer"
                   >
                     <span>Proceed to Next Step</span>
                     <ArrowRight className="w-4 h-4" />
@@ -634,7 +656,7 @@ export const JourneyWizard: React.FC<JourneyWizardProps> = ({
                   <button
                     type="button"
                     onClick={handleGenerate}
-                    className="px-7 py-3 rounded-xl bg-gradient-to-r from-gold-500 via-gold-400 to-gold-600 text-charcoal-950 text-xs font-bold tracking-wide shadow-gold-glow hover:brightness-110 active:scale-95 transition-all flex items-center space-x-2"
+                    className="btn-gold px-7 py-3 rounded-xl text-xs font-bold tracking-wide shadow-gold-glow flex items-center space-x-2 cursor-pointer"
                   >
                     <span>Synthesize 3D Building</span>
                     <Sparkles className="w-4 h-4 stroke-[2.5]" />

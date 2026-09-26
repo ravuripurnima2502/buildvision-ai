@@ -1,21 +1,27 @@
-import { Project } from '../types/project';
+import { Project, User } from '../types/project';
 import { INITIAL_DEMO_PROJECTS } from '../demo/sampleProjects';
 
-const STORAGE_KEY_PROJECTS = 'buildvision_ai_projects_v1';
-const STORAGE_KEY_USER = 'buildvision_ai_user_session';
+const STORAGE_KEY_PROJECTS = 'buildvision_projects';
+const STORAGE_KEY_USER = 'buildvision_user';
 
-export function loadProjects(): Project[] {
+/**
+ * Load all projects from browser localStorage.
+ * Initializes with starter architectural projects if storage is empty.
+ */
+export function loadProjects(_userId?: string): Project[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_PROJECTS);
     if (!raw) {
       saveProjects(INITIAL_DEMO_PROJECTS);
       return INITIAL_DEMO_PROJECTS;
     }
+
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) {
       saveProjects(INITIAL_DEMO_PROJECTS);
       return INITIAL_DEMO_PROJECTS;
     }
+
     return parsed;
   } catch (err) {
     console.error('Error loading projects from localStorage:', err);
@@ -23,7 +29,10 @@ export function loadProjects(): Project[] {
   }
 }
 
-export function saveProjects(projects: Project[]): void {
+/**
+ * Save projects list to browser localStorage.
+ */
+export function saveProjects(projects: Project[], _userId?: string): void {
   try {
     localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(projects));
   } catch (err) {
@@ -31,28 +40,45 @@ export function saveProjects(projects: Project[]): void {
   }
 }
 
-export function getProjectById(id: string): Project | undefined {
+/**
+ * Retrieve a project by its unique ID.
+ */
+export function getProjectById(id: string, _userId?: string): Project | undefined {
+  if (!id) return undefined;
   const projects = loadProjects();
   return projects.find(p => p.id === id);
 }
 
-export function saveProject(project: Project): void {
+/**
+ * Save or update a single project in localStorage.
+ */
+export function saveProject(project: Project, _userId?: string): void {
   const projects = loadProjects();
   const index = projects.findIndex(p => p.id === project.id);
+
   if (index >= 0) {
-    projects[index] = project;
+    projects[index] = { ...project, updatedAt: new Date().toISOString() };
   } else {
-    projects.unshift(project);
+    projects.unshift({ ...project, updatedAt: new Date().toISOString() });
   }
+
   saveProjects(projects);
 }
 
-export function deleteProject(id: string): void {
+/**
+ * Delete a project by ID from localStorage.
+ */
+export function deleteProject(id: string, _userId?: string): void {
+  if (!id) return;
   const projects = loadProjects().filter(p => p.id !== id);
   saveProjects(projects);
 }
 
-export function duplicateProject(id: string): Project | undefined {
+/**
+ * Duplicate an existing project in localStorage.
+ */
+export function duplicateProject(id: string, _userId?: string): Project | undefined {
+  if (!id) return undefined;
   const original = getProjectById(id);
   if (!original) return undefined;
 
@@ -66,19 +92,30 @@ export function duplicateProject(id: string): Project | undefined {
   return clone;
 }
 
-export function loadStoredUser() {
+/**
+ * Retrieve current active user profile from localStorage.
+ */
+export function loadStoredUser(): User | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_USER);
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    return JSON.parse(raw);
   } catch {
     return null;
   }
 }
 
-export function saveStoredUser(user: any) {
-  if (!user) {
-    localStorage.removeItem(STORAGE_KEY_USER);
-  } else {
-    localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+/**
+ * Save user profile to localStorage (or remove if null).
+ */
+export function saveStoredUser(user: User | null): void {
+  try {
+    if (!user) {
+      localStorage.removeItem(STORAGE_KEY_USER);
+    } else {
+      localStorage.setItem(STORAGE_KEY_USER, JSON.stringify(user));
+    }
+  } catch (err) {
+    console.error('Error saving user to localStorage:', err);
   }
 }

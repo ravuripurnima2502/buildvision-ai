@@ -71,19 +71,19 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
   };
 
   return (
-    <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[92vw] sm:w-[380px] max-h-[580px] rounded-3xl glass-panel-gold border shadow-2xl flex flex-col overflow-hidden animate-slideUp select-none theme-card">
+    <div className="fixed bottom-24 right-4 sm:right-6 z-50 w-[92vw] sm:w-[380px] max-h-[580px] rounded-3xl bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 shadow-2xl flex flex-col overflow-hidden animate-slideUp select-none">
       {/* Drawer Header */}
-      <div className="p-3.5 bg-theme-surface/95 border-b border-theme-subtle flex items-center justify-between">
+      <div className="p-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
         <div className="flex items-center space-x-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gold-500/20 border border-gold-400/50 flex items-center justify-center text-gold-400 shadow-sm">
+          <div className="w-8 h-8 rounded-xl bg-gold-500/15 border border-gold-400/40 flex items-center justify-center text-gold-400 shadow-sm">
             <Bot className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs font-display font-bold text-theme-primary flex items-center space-x-1.5">
-              <span>👷 BuildVision Engineer</span>
+            <h4 className="text-xs font-display font-bold text-white flex items-center space-x-1.5">
+              <span>👷 BuildVision Civil Copilot</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
             </h4>
-            <p className="text-[10px] text-theme-muted font-mono">AI Civil Companion • Active</p>
+            <p className="text-[10px] text-slate-400 font-mono">BIM &amp; Civil Engineering Intelligence</p>
           </div>
         </div>
 
@@ -91,14 +91,14 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
           <button
             onClick={onClose}
             title="Minimize"
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-black/20 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors cursor-pointer"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={onClose}
             title="Close"
-            className="p-1.5 text-slate-400 hover:text-white hover:bg-black/20 rounded-lg transition-colors"
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -106,16 +106,16 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
       </div>
 
       {/* Live Context Banner */}
-      <div className="px-3.5 py-1.5 bg-theme-base/90 border-b border-theme-subtle text-[10px] font-mono text-gold-400 flex items-center justify-between">
+      <div className="px-3.5 py-1.5 bg-[#080C14] border-b border-white/[0.06] text-[10px] font-mono text-gold-400 flex items-center justify-between">
         <span className="truncate max-w-[180px]">
           {context.projectName ? `Project: ${context.projectName}` : 'BuildVision Platform'}
         </span>
-        <span>
+        <span className="text-slate-400">
           {context.selectedRoomName
             ? `Room: ${context.selectedRoomName}`
             : context.totalFloors > 0
-            ? `${context.totalFloors} Floors`
-            : 'Ready to assist'}
+            ? `${context.totalFloors} Levels`
+            : 'Active'}
         </span>
       </div>
 
@@ -127,16 +127,16 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
             className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
           >
             <div
-              className={`p-3 rounded-2xl max-w-[86%] leading-relaxed ${
+              className={`p-3 rounded-2xl max-w-[88%] leading-relaxed ${
                 msg.sender === 'user'
                   ? 'bg-gradient-to-r from-gold-500 to-gold-600 text-charcoal-950 font-medium shadow-md rounded-br-none'
-                  : 'bg-theme-surface/90 border border-theme-subtle text-theme-primary rounded-bl-none shadow-sm'
+                  : 'bg-white/[0.04] border border-white/[0.08] text-slate-200 rounded-bl-none shadow-sm'
               }`}
             >
               {msg.text}
 
               {msg.civilTip && (
-                <div className="mt-2 pt-2 border-t border-theme-subtle text-[11px] text-gold-400 flex items-start space-x-1.5">
+                <div className="mt-2 pt-2 border-t border-white/[0.08] text-[11px] text-gold-400 flex items-start space-x-1.5">
                   <Lightbulb className="w-3.5 h-3.5 text-gold-400 shrink-0 mt-0.5" />
                   <span>{msg.civilTip}</span>
                 </div>
@@ -150,7 +150,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
                   <button
                     key={idx}
                     onClick={() => handleSend(q)}
-                    className="text-[10px] text-left px-2.5 py-1.5 rounded-xl bg-theme-surface/80 hover:bg-gold-500/20 text-gold-400 hover:text-gold-300 border border-theme-subtle transition-all"
+                    className="text-[10px] text-left px-2.5 py-1.5 rounded-xl bg-white/[0.03] hover:bg-gold-500/15 text-gold-400 hover:text-gold-300 border border-white/[0.08] transition-all cursor-pointer"
                   >
                     {q}
                   </button>
@@ -161,7 +161,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
         ))}
 
         {isTyping && (
-          <div className="flex items-center space-x-1.5 text-xs text-theme-muted bg-theme-surface border border-theme-subtle p-2.5 rounded-2xl w-24">
+          <div className="flex items-center space-x-1.5 text-xs text-slate-400 bg-white/[0.04] border border-white/[0.08] p-2.5 rounded-2xl w-24">
             <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-bounce"></span>
             <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-bounce [animation-delay:0.2s]"></span>
             <span className="w-1.5 h-1.5 rounded-full bg-gold-400 animate-bounce [animation-delay:0.4s]"></span>
@@ -171,7 +171,7 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
       </div>
 
       {/* Input Box */}
-      <div className="p-3 bg-theme-surface/95 border-t border-theme-subtle">
+      <div className="p-3 bg-white/[0.02] border-t border-white/[0.08]">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -183,21 +183,21 @@ export const RoboChatDrawer: React.FC<RoboChatDrawerProps> = ({
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a construction question…"
-            className="flex-1 bg-theme-base border border-theme-subtle rounded-xl px-3 py-2 text-xs text-theme-primary placeholder-slate-500 focus:outline-none focus:border-gold-500"
+            placeholder="Ask about structural reinforcement, layouts, costs…"
+            className="flex-1 bg-[#080C14] border border-white/[0.1] rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold-500 font-sans"
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="p-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-charcoal-950 font-bold disabled:opacity-40 transition-colors shadow-gold-glow"
+            className="p-2 rounded-xl bg-gold-500 hover:bg-gold-400 text-charcoal-950 font-bold disabled:opacity-40 transition-colors shadow-gold-glow cursor-pointer"
           >
             <Send className="w-3.5 h-3.5" />
           </button>
         </form>
 
         {/* Educational Disclaimer */}
-        <p className="text-[9px] text-theme-muted mt-2 text-center leading-tight">
-          Educational guidance only. Always consult a licensed structural engineer for official approvals.
+        <p className="text-[9px] text-slate-400 mt-2 text-center leading-tight font-mono">
+          Parametric civil estimation companion • For official approval, verify with a licensed structural engineer.
         </p>
       </div>
     </div>

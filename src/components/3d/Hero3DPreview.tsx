@@ -1,117 +1,419 @@
-import React, { Suspense } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, ContactShadows } from '@react-three/drei';
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  HeroVillaCanvas,
+  HeroRoomKey,
+  HeroFloorKey,
+  HeroLightingKey,
+} from './hero/HeroVillaCanvas';
+import {
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  Play,
+  Pause,
+  Sun,
+  Moon,
+  Sunset,
+  Sparkles,
+  Layers,
+  Compass,
+  Info,
+  ChevronRight,
+  ZoomIn,
+  ZoomOut,
+  Rotate3d,
+} from 'lucide-react';
+
+interface RoomThumbnailItem {
+  id: HeroRoomKey;
+  label: string;
+  floor: string;
+  area: string;
+  dimensions: string;
+  img: string;
+  description: string;
+}
+
+const ROOM_ITEMS: RoomThumbnailItem[] = [
+  {
+    id: 'exterior',
+    label: 'Exterior & Pool',
+    floor: 'Overall',
+    area: '3,200 sq ft',
+    dimensions: '14 × 16 m',
+    img: '/thumbnails/exterior.jpg',
+    description: 'Modern two-storey luxury villa with cantilevered volumes and infinity pool.',
+  },
+  {
+    id: 'living',
+    label: 'Living Room',
+    floor: 'Ground Floor',
+    area: '480 sq ft',
+    dimensions: '20 × 24 ft',
+    img: '/thumbnails/living.jpg',
+    description: 'Double-height open living space with Carrara marble and panoramic glazing.',
+  },
+  {
+    id: 'kitchen',
+    label: 'Kitchen & Dining',
+    floor: 'Ground Floor',
+    area: '420 sq ft',
+    dimensions: '18 × 23 ft',
+    img: '/thumbnails/kitchen.jpg',
+    description: 'Calacatta waterfall island counter with integrated appliances and bar seating.',
+  },
+  {
+    id: 'bedroom',
+    label: 'Master Suite',
+    floor: 'First Floor (2F)',
+    area: '360 sq ft',
+    dimensions: '18 × 20 ft',
+    img: '/thumbnails/bedroom.jpg',
+    description: 'Upper cantilevered master suite with European oak flooring and ambient headboard.',
+  },
+  {
+    id: 'bathroom',
+    label: 'Luxury Ensuite',
+    floor: 'First Floor (2F)',
+    area: '180 sq ft',
+    dimensions: '12 × 15 ft',
+    img: '/thumbnails/bathroom.jpg',
+    description: 'Sculptural freestanding soaking tub, floating double vanity and frameless glass.',
+  },
+];
 
 export const Hero3DPreview: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // States
+  const [activeRoom, setActiveRoom] = useState<HeroRoomKey>('exterior');
+  const [activeFloor, setActiveFloor] = useState<HeroFloorKey>('ALL');
+  const [lightingMode, setLightingMode] = useState<HeroLightingKey>('sunset');
+  const [isAutoRotate, setIsAutoRotate] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Walkthrough State
+  const [isWalkthroughActive, setIsWalkthroughActive] = useState(false);
+  const [walkthroughProgress, setWalkthroughProgress] = useState(0);
+
+  // Handle Fullscreen toggle
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+    if (!document.fullscreenElement) {
+      containerRef.current.requestFullscreen().catch((err) => {
+        console.warn('Fullscreen request failed:', err);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen().catch((err) => {
+        console.warn('Exit fullscreen failed:', err);
+      });
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  // Walkthrough Animation Loop
+  useEffect(() => {
+    if (!isWalkthroughActive) return;
+
+    let animFrame: number;
+    let startTime: number | null = null;
+    const duration = 24000; // 24 seconds for complete cinematic tour
+
+    const loop = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = (elapsed % duration) / duration;
+      setWalkthroughProgress(progress);
+
+      // Auto-update room HUD label based on current progress phase
+      if (progress < 0.15) {
+        setActiveRoom('exterior');
+      } else if (progress < 0.35) {
+        setActiveRoom('living');
+      } else if (progress < 0.55) {
+        setActiveRoom('kitchen');
+      } else if (progress < 0.75) {
+        setActiveRoom('bedroom');
+      } else if (progress < 0.9) {
+        setActiveRoom('bathroom');
+      } else {
+        setActiveRoom('exterior');
+      }
+
+      animFrame = requestAnimationFrame(loop);
+    };
+
+    animFrame = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(animFrame);
+    };
+  }, [isWalkthroughActive]);
+
+  const currentRoomInfo = ROOM_ITEMS.find((r) => r.id === activeRoom) || ROOM_ITEMS[0];
+
+  const handleSelectRoom = (roomId: HeroRoomKey) => {
+    if (isWalkthroughActive) setIsWalkthroughActive(false);
+    setActiveRoom(roomId);
+    if (roomId === 'bedroom' || roomId === 'bathroom') {
+      setActiveFloor('2F');
+    } else if (roomId === 'living' || roomId === 'kitchen') {
+      setActiveFloor('GF');
+    } else {
+      setActiveFloor('ALL');
+    }
+  };
+
+  const handleSelectFloor = (floorId: HeroFloorKey) => {
+    if (isWalkthroughActive) setIsWalkthroughActive(false);
+    setActiveFloor(floorId);
+    if (floorId === 'GF') {
+      if (activeRoom === 'bedroom' || activeRoom === 'bathroom') {
+        setActiveRoom('living');
+      }
+    } else if (floorId === '2F' || floorId === '1F') {
+      if (activeRoom === 'living' || activeRoom === 'kitchen') {
+        setActiveRoom('bedroom');
+      }
+    }
+  };
+
   return (
-    <div className="w-full h-full min-h-[380px] relative rounded-2xl overflow-hidden border border-gold-500/20 shadow-gold-glow">
-      <Canvas
-        camera={{ position: [14, 11, 14], fov: 42 }}
-        gl={{ antialias: true }}
-      >
-        <color attach="background" args={['#080C14']} />
-        <ambientLight intensity={0.7} color="#FAF5E4" />
-        <directionalLight position={[15, 25, 12]} intensity={1.5} color="#FFF8E7" castShadow />
-        <directionalLight position={[-10, 15, -10]} intensity={0.5} color="#38BDF8" />
+    <div
+      ref={containerRef}
+      className={`w-full relative rounded-2xl overflow-hidden border border-white/[0.08] bg-[#070A0F] shadow-card-elevated transition-all ${
+        isFullscreen ? 'h-screen fixed inset-0 z-50 rounded-none' : 'h-[500px] sm:h-[540px] lg:h-[580px]'
+      }`}
+    >
+      {/* 3D WebGL Canvas */}
+      <HeroVillaCanvas
+        activeRoom={activeRoom}
+        activeFloor={activeFloor}
+        lightingMode={lightingMode}
+        isAutoRotate={isAutoRotate}
+        isWalkthroughActive={isWalkthroughActive}
+        walkthroughProgress={walkthroughProgress}
+        onRoomSelect={handleSelectRoom}
+      />
 
-        <Suspense fallback={null}>
-          <group position={[0, -1.5, 0]}>
-            {/* Ground Slab */}
-            <mesh position={[0, -0.05, 0]} receiveShadow>
-              <boxGeometry args={[14, 0.1, 14]} />
-              <meshStandardMaterial color="#0F172A" roughness={0.8} />
-            </mesh>
-            <mesh position={[0, -0.05, 0]}>
-              <boxGeometry args={[14.1, 0.05, 14.1]} />
-              <meshStandardMaterial color="#D4AF37" metalness={0.9} roughness={0.2} />
-            </mesh>
+      {/* ======================================================== */}
+      {/* TOP HEADER OVERLAYS                                     */}
+      {/* ======================================================== */}
+      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
+        {/* Live Status Badge */}
+        <div className="flex items-center space-x-2 pointer-events-auto">
+          <div className="bg-[#0B1017]/85 backdrop-blur-xl border border-white/[0.08] px-3 py-1.5 rounded-xl flex items-center space-x-2 text-xs text-slate-200 font-mono shadow-lg">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="font-semibold text-slate-100 tracking-wide text-[11px]">LIVE 3D BIM PREVIEW</span>
+            <span className="text-slate-600">•</span>
+            <span className="text-[11px] text-slate-400 hidden sm:inline">Modern Villa Cutaway</span>
+          </div>
 
-            {/* Level 0: Ground Floor Modern Residence */}
-            <group position={[0, 0, 0]}>
-              {/* Main Foyer & Living Volume */}
-              <mesh position={[-2, 1.5, 1]} castShadow>
-                <boxGeometry args={[5.5, 3.0, 6.0]} />
-                <meshStandardMaterial color="#1E293B" roughness={0.4} />
-              </mesh>
-              {/* Panoramic Glass Facade */}
-              <mesh position={[-2, 1.5, 4.02]}>
-                <boxGeometry args={[4.8, 2.4, 0.05]} />
-                <meshPhysicalMaterial color="#38BDF8" transmission={0.9} roughness={0.1} transparent />
-              </mesh>
-              {/* Dining & Garage Volume */}
-              <mesh position={[3.2, 1.5, 0]} castShadow>
-                <boxGeometry args={[4.5, 3.0, 7.5]} />
-                <meshStandardMaterial color="#0F172A" roughness={0.6} />
-              </mesh>
-            </group>
+          {/* Active Room Title HUD */}
+          <div className="hidden md:flex items-center bg-[#0B1017]/85 backdrop-blur-xl border border-white/[0.08] px-3 py-1.5 rounded-xl text-xs text-slate-300 font-mono">
+            <span className="text-gold-400 font-semibold mr-1.5">{currentRoomInfo.label}</span>
+            <span className="text-slate-600 mr-1.5">|</span>
+            <span className="text-slate-400">{currentRoomInfo.area}</span>
+          </div>
+        </div>
 
-            {/* Intermediate Slab */}
-            <mesh position={[0, 3.08, 0]}>
-              <boxGeometry args={[12.5, 0.16, 12.5]} />
-              <meshStandardMaterial color="#D4AF37" metalness={0.8} roughness={0.2} />
-            </mesh>
+        {/* 3D Control Bar: Rotate, Zoom, Lighting, Fullscreen */}
+        <div className="flex items-center space-x-1 sm:space-x-1.5 pointer-events-auto bg-[#0B1017]/85 backdrop-blur-xl border border-white/[0.08] p-1.5 rounded-xl shadow-lg">
+          {/* Lighting Mode Selector */}
+          <button
+            onClick={() => {
+              if (lightingMode === 'sunset') setLightingMode('night');
+              else if (lightingMode === 'night') setLightingMode('day');
+              else setLightingMode('sunset');
+            }}
+            title={`Lighting: ${lightingMode.toUpperCase()} (Click to toggle)`}
+            className="p-1.5 rounded-lg hover:bg-white/[0.08] text-slate-300 hover:text-gold-300 transition-colors cursor-pointer"
+          >
+            {lightingMode === 'sunset' ? (
+              <Sunset className="w-4 h-4 text-amber-400" />
+            ) : lightingMode === 'night' ? (
+              <Moon className="w-4 h-4 text-cyan-400" />
+            ) : (
+              <Sun className="w-4 h-4 text-yellow-300" />
+            )}
+          </button>
 
-            {/* Level 1: Upper Cantilever Suite */}
-            <group position={[0, 3.16, 0]}>
-              {/* Cantilever Master Suite Box */}
-              <mesh position={[1, 1.5, -0.5]} castShadow>
-                <boxGeometry args={[7.0, 3.0, 7.0]} />
-                <meshStandardMaterial color="#1E293B" roughness={0.4} />
-              </mesh>
-              {/* Glass Corner Window */}
-              <mesh position={[1, 1.5, 3.02]}>
-                <boxGeometry args={[5.5, 2.2, 0.05]} />
-                <meshPhysicalMaterial color="#38BDF8" transmission={0.9} roughness={0.1} transparent />
-              </mesh>
-              {/* Cantilever Balcony Deck */}
-              <mesh position={[-3.2, 0.1, 1.5]} castShadow>
-                <boxGeometry args={[4.2, 0.15, 3.8]} />
-                <meshStandardMaterial color="#0F766E" roughness={0.5} />
-              </mesh>
-              {/* Glass Railing */}
-              <mesh position={[-3.2, 0.65, 3.35]}>
-                <boxGeometry args={[4.2, 0.95, 0.04]} />
-                <meshPhysicalMaterial color="#38BDF8" transmission={0.9} transparent opacity={0.6} />
-              </mesh>
-            </group>
+          {/* Auto Rotate Toggle */}
+          <button
+            onClick={() => setIsAutoRotate(!isAutoRotate)}
+            title={isAutoRotate ? 'Disable Auto Rotate' : 'Enable 360° Architectural Orbit'}
+            className={`p-1.5 rounded-lg transition-all cursor-pointer ${
+              isAutoRotate ? 'bg-gold-500/20 text-gold-300 border border-gold-500/40' : 'text-slate-300 hover:bg-white/[0.08]'
+            }`}
+          >
+            <Rotate3d className="w-4 h-4" />
+          </button>
 
-            {/* Roof Slab & Pergola */}
-            <group position={[0, 6.24, 0]}>
-              <mesh position={[0, 0.08, 0]}>
-                <boxGeometry args={[11, 0.16, 10]} />
-                <meshStandardMaterial color="#0F172A" roughness={0.7} />
-              </mesh>
-              {/* Golden Architectural Pergola Louvers */}
-              {[-3, -1.8, -0.6, 0.6, 1.8, 3].map((pos, i) => (
-                <mesh key={i} position={[pos, 1.2, 0]}>
-                  <boxGeometry args={[0.08, 0.2, 6]} />
-                  <meshStandardMaterial color="#D4AF37" metalness={0.9} roughness={0.2} />
-                </mesh>
-              ))}
-            </group>
-
-            {/* Contact Shadows */}
-            <ContactShadows position={[0, 0, 0]} opacity={0.7} scale={20} blur={2.5} far={8} color="#000000" />
-          </group>
-
-          <OrbitControls
-            enableZoom={false}
-            enablePan={false}
-            autoRotate
-            autoRotateSpeed={1.2}
-            maxPolarAngle={Math.PI / 2.1}
-            minPolarAngle={Math.PI / 3.5}
-          />
-        </Suspense>
-      </Canvas>
-
-      {/* Luxury Overlay Badge */}
-      <div className="absolute top-4 left-4 bg-charcoal-900/80 backdrop-blur-md border border-gold-500/30 px-3 py-1.5 rounded-full flex items-center space-x-2 text-xs text-gold-300 font-mono">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>LIVE 3D BIM PREVIEW</span>
+          {/* Fullscreen Toggle */}
+          <button
+            onClick={toggleFullscreen}
+            title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen 3D BIM Studio'}
+            className="p-1.5 rounded-lg hover:bg-white/[0.08] text-slate-300 hover:text-gold-300 transition-colors cursor-pointer"
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
-      <div className="absolute bottom-4 right-4 bg-charcoal-900/80 backdrop-blur-md border border-slate-700/60 px-3 py-1.5 rounded-lg text-xs text-slate-300 font-mono">
-        Drag to Rotate • 60 FPS
+
+      {/* ======================================================== */}
+      {/* RIGHT SIDE: VERTICAL FLOOR SELECTOR                      */}
+      {/* ======================================================== */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex flex-col items-center space-y-2 select-none">
+        <div className="bg-[#0B1017]/85 backdrop-blur-xl border border-white/[0.08] p-1.5 rounded-2xl shadow-xl flex flex-col space-y-1.5">
+          <div className="text-[9px] font-mono uppercase tracking-widest text-slate-400 text-center py-0.5">
+            Floors
+          </div>
+
+          {/* 2F Button */}
+          <button
+            onClick={() => handleSelectFloor('2F')}
+            className={`w-10 h-10 rounded-xl font-mono text-xs font-bold transition-all flex flex-col items-center justify-center cursor-pointer ${
+              activeFloor === '2F'
+                ? 'btn-gold shadow-gold-glow scale-105'
+                : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
+            }`}
+            title="Second Floor (2F) - Master Suite, Ensuite Bath, Balcony"
+          >
+            <span>2F</span>
+            <span className="text-[8px] font-normal leading-none opacity-80">Upper</span>
+          </button>
+
+          {/* 1F Button */}
+          <button
+            onClick={() => handleSelectFloor('1F')}
+            className={`w-10 h-10 rounded-xl font-mono text-xs font-bold transition-all flex flex-col items-center justify-center cursor-pointer ${
+              activeFloor === '1F'
+                ? 'btn-gold shadow-gold-glow scale-105'
+                : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
+            }`}
+            title="First Floor (1F) - Bedrooms & Terrace Level"
+          >
+            <span>1F</span>
+            <span className="text-[8px] font-normal leading-none opacity-80">Mid</span>
+          </button>
+
+          {/* GF Button */}
+          <button
+            onClick={() => handleSelectFloor('GF')}
+            className={`w-10 h-10 rounded-xl font-mono text-xs font-bold transition-all flex flex-col items-center justify-center cursor-pointer ${
+              activeFloor === 'GF'
+                ? 'btn-gold shadow-gold-glow scale-105'
+                : 'text-slate-300 hover:text-white hover:bg-white/[0.06]'
+            }`}
+            title="Ground Floor (GF) - Living, Dining, Kitchen, Stairs, Parking & Pool"
+          >
+            <span>GF</span>
+            <span className="text-[8px] font-normal leading-none opacity-80">Ground</span>
+          </button>
+
+          <div className="w-full h-px bg-white/[0.08] my-0.5"></div>
+
+          {/* ALL Button */}
+          <button
+            onClick={() => handleSelectFloor('ALL')}
+            className={`w-10 h-8 rounded-xl font-mono text-[10px] font-bold transition-all flex items-center justify-center cursor-pointer ${
+              activeFloor === 'ALL'
+                ? 'bg-gold-500/20 text-gold-300 border border-gold-500/40 shadow-gold-glow'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]'
+            }`}
+            title="View Full Two-Storey Structure"
+          >
+            ALL
+          </button>
+        </div>
+
+        {/* Start Walkthrough Action Button */}
+        <button
+          onClick={() => setIsWalkthroughActive(!isWalkthroughActive)}
+          className={`px-3 py-2 rounded-xl text-xs font-bold font-mono tracking-wider flex items-center space-x-1.5 shadow-xl transition-all cursor-pointer ${
+            isWalkthroughActive
+              ? 'bg-rose-500/90 text-white shadow-rose-500/20 animate-pulse'
+              : 'btn-gold shadow-gold-glow'
+          }`}
+          title="Start Architectural 3D Walkthrough"
+        >
+          {isWalkthroughActive ? (
+            <>
+              <Pause className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Pause</span>
+            </>
+          ) : (
+            <>
+              <Play className="w-3.5 h-3.5 fill-current" />
+              <span className="hidden sm:inline">Tour</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* ======================================================== */}
+      {/* BOTTOM: HORIZONTAL ROOM PREVIEW THUMBNAILS STRIP        */}
+      {/* ======================================================== */}
+      <div className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-10 select-none">
+        <div className="bg-[#0B1017]/85 backdrop-blur-xl border border-white/[0.08] p-2 sm:p-2.5 rounded-2xl shadow-2xl flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+          {/* Thumbnails Row */}
+          <div className="flex items-center space-x-2 sm:space-x-3 min-w-max">
+            {ROOM_ITEMS.map((item) => {
+              const isSelected = activeRoom === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => handleSelectRoom(item.id)}
+                  className={`group relative flex items-center space-x-2.5 px-2 py-1.5 rounded-xl border transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-gold-500/15 border-gold-500/60 shadow-gold-glow'
+                      : 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.15] hover:bg-white/[0.05]'
+                  }`}
+                >
+                  {/* Thumbnail Image Container */}
+                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg overflow-hidden shrink-0 border border-white/[0.08] relative">
+                    <img
+                      src={item.img}
+                      alt={item.label}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    {isSelected && (
+                      <div className="absolute inset-0 bg-gold-500/20 border-2 border-gold-400 rounded-lg pointer-events-none"></div>
+                    )}
+                  </div>
+
+                  {/* Room Label & Floor Subtitle */}
+                  <div className="text-left pr-2 hidden sm:block">
+                    <p
+                      className={`text-xs font-semibold leading-tight transition-colors ${
+                        isSelected ? 'text-gold-300' : 'text-slate-200 group-hover:text-white'
+                      }`}
+                    >
+                      {item.label}
+                    </p>
+                    <p className="text-[10px] text-slate-400 font-mono leading-tight mt-0.5">
+                      {item.floor}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Quick Walkthrough / Gesture Hint */}
+          <div className="hidden lg:flex items-center text-[11px] font-mono text-slate-400 pl-3 border-l border-white/[0.08] shrink-0">
+            <span>Click Room or Drag to Orbit</span>
+          </div>
+        </div>
       </div>
     </div>
   );
