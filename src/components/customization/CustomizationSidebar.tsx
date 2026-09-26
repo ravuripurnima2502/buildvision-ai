@@ -75,24 +75,24 @@ export const CustomizationSidebar: React.FC<CustomizationSidebarProps> = ({
 
   return (
     <>
-      {/* Minimized Dock Bar */}
+      {/* Minimized Dock Bar on RIGHT */}
       {!isExpanded && (
-        <div className="absolute top-20 left-4 z-30 flex flex-col space-y-2 select-none animate-fadeIn">
+        <div className="absolute top-[90px] right-6 z-30 flex flex-col space-y-2 select-none animate-fadeIn">
           <button
             onClick={handleToggle}
             className="p-3 rounded-2xl bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 text-gold-400 hover:text-white hover:bg-gold-500/20 shadow-2xl transition-all cursor-pointer flex items-center space-x-2 group"
             title="Open Architectural Customization Studio"
           >
+            <ChevronLeft className="w-4 h-4 text-gold-400 group-hover:-translate-x-0.5 transition-transform" />
             <SlidersHorizontal className="w-5 h-5 text-gold-400 group-hover:rotate-90 transition-transform duration-300" />
             <span className="text-xs font-display font-bold pr-1">Customize Studio</span>
-            <ChevronRight className="w-4 h-4 text-gold-400" />
           </button>
         </div>
       )}
 
-      {/* Expanded Architectural Customization Drawer */}
+      {/* Expanded Architectural Customization Drawer on RIGHT */}
       {isExpanded && (
-        <div className="absolute top-20 left-4 bottom-6 z-30 w-80 sm:w-96 bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideRight select-none">
+        <div className="absolute top-[90px] right-6 z-30 w-[350px] max-w-[calc(100vw-3rem)] max-h-[calc(100vh-120px)] bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-slideLeft select-none">
           {/* Main Top Header */}
           <div className="p-3.5 bg-white/[0.02] border-b border-white/[0.08] flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
@@ -112,7 +112,7 @@ export const CustomizationSidebar: React.FC<CustomizationSidebarProps> = ({
               className="p-1.5 text-slate-400 hover:text-white hover:bg-white/[0.08] rounded-xl transition-colors cursor-pointer"
               title="Collapse Panel"
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
 
@@ -174,7 +174,7 @@ export const CustomizationSidebar: React.FC<CustomizationSidebarProps> = ({
           </div>
 
           {/* Active Tab Panel Content */}
-          <div className="flex-1 p-3.5 overflow-hidden flex flex-col">
+          <div className="flex-1 p-3.5 overflow-y-auto flex flex-col min-h-0">
             {activeTab === 'add_element' && (
               <AddElementPanel
                 spec={spec}

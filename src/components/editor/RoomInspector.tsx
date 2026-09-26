@@ -25,7 +25,7 @@ export const RoomInspector: React.FC<RoomInspectorProps> = ({
   if (!room) return null;
 
   return (
-    <div className="absolute top-20 right-4 z-30 w-72 sm:w-80 bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 rounded-2xl p-4 shadow-2xl animate-slideLeft select-none">
+    <div className="absolute top-[90px] right-6 xl:right-[390px] z-30 w-72 sm:w-80 bg-[#0B1017]/95 backdrop-blur-2xl border border-gold-500/40 rounded-2xl p-4 shadow-2xl animate-slideLeft select-none">
       {/* Header */}
       <div className="flex items-start justify-between pb-2.5 border-b border-white/[0.08]">
         <div>
